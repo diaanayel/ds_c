@@ -7,7 +7,7 @@
 ### to run
 * create dirs: build, lib, bin
 * edit test/CMakeLists.txt
-  * set UNITY PATH with the unity framework in your machine 
+  * set UNITY PATH to the unity framework clone in your machine 
   * configure libraries and links -if changed any-.
 * build & run using the build script, **named bb** in the source dir
 * you must specify for which group you are building for test/release: ./bb test
