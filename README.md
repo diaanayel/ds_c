@@ -11,12 +11,12 @@
 * edit test/CMakeLists.txt
   * set UNITY PATH to the unity framework clone in your machine 
   * use **add_subdurectory()** to add a specific test folder
-  * configure libraries and links for each test in test/testFolder/CMakeLists.txt
-* build & run using the build script, **named bb** in the source dir
+* configure libraries and links for each test in test/testFolder/CMakeLists.txt
+* build & run using the build script, **named bb** in the source dir (not an obligation)
 * you must specify for which group you are building for test/release: ./bb test
 
-* addee local .vimrc:
-  * if you don't know, add set exrc to your main vimrc
+* there is a local .vimrc:
+  * if you don't know, add **set exrc** to your main vimrc
   * the default mapping is <C-x>
   * change the task to the needed one in it
 
