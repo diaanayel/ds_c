@@ -18,11 +18,11 @@ stack_free(Stack *stack, int *err)
 {
   if(!is_valid_stack(stack, err)) return;
 
+  Node *holder;
+  
   while(stack->top != NULL)
   {
-    Node *holder = stack->top;
-    if(!is_valid_stack_node(holder, err)) return;
-
+    holder = stack->top;
     stack->top = stack->top->next;
 
     free(holder);
@@ -35,7 +35,12 @@ stack_free(Stack *stack, int *err)
 bool
 is_valid_stack_node(const Node * const node, int *err)
 {
-  if(node == NULL) { *err = STACK_NODE_NULL; return false; }
+  if(node == NULL)
+  {
+    if(err != NULL)
+      *err = STACK_NODE_NULL;
+    return false;
+  }
 
   return true;
 }
@@ -43,7 +48,12 @@ is_valid_stack_node(const Node * const node, int *err)
 bool
 is_valid_stack(const Stack * const stack, int *err)
 {
-  if(stack == NULL) { *err = STACK_NULL; return false; }
+  if(stack == NULL)
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return false;
+  }
 
   return true;
 }
@@ -75,9 +85,15 @@ stack_peek(const Stack * const stack, int *output,int *err)
 {
   if(!is_valid_stack(stack, err)) return;
 
-  if(is_empty_stack(stack, err)) { *err = STACK_EMPTY; return;}
+  if(is_empty_stack(stack, err))
+  {
+    if(err != NULL)
+      *err = STACK_EMPTY;
+    return;
+  }
 
-  *output = stack->top->data;
+  if(output != NULL)
+    *output = stack->top->data;
 }
 
 void
@@ -85,9 +101,15 @@ stack_pop(Stack * const stack, int *output,int *err)
 {
   if(!is_valid_stack(stack, err)) return;
 
-  if(is_empty_stack(stack, err)) { *err = STACK_EMPTY; return;}
+  if(is_empty_stack(stack, err))
+  {
+    if(err != NULL)
+      *err = STACK_EMPTY;
+    return;
+  }
 
-  *output = stack->top->data;
+  if(output != NULL)
+    *output = stack->top->data;
 
   Node *node_to_remove = stack->top;
   if(!is_valid_stack_node(node_to_remove, err)) return;
@@ -104,19 +126,14 @@ stack_clear(Stack *stack, int *err)
 {
   if(!is_valid_stack(stack, err)) return;
 
-  if(is_empty_stack(stack, err)) { *err = STACK_EMPTY; return;}
-
-  Node *holder = stack->top;
-  if(!is_valid_stack_node(holder, err)) return;
-
-  while(holder != NULL)
+  if(is_empty_stack(stack, err))
   {
-    Node *temp = holder;
-    holder = holder->next;
-
-    free(temp);
-    stack->size--;
+    if(err != NULL)
+      *err = STACK_EMPTY;
+    return;
   }
-  stack->top = NULL;
+
+  while(stack->size != 0)
+    stack_pop(stack, NULL, err);
 }
 

@@ -1,5 +1,4 @@
 #include <sl_list.h>
-#include <stdbool.h>
 
 SL_List*
 sll_init(int *err)

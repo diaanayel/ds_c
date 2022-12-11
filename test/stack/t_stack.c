@@ -161,20 +161,6 @@ t_clear_empty_stack()
 }
 
 void
-t_clear_non_empty_stack()
-{
-  stack_push(stack, 10, &err);
-  stack_push(stack, 10, &err);
-  stack_push(stack, 10, &err);
-  stack_push(stack, 10, &err);
-
-  stack_clear(stack, &err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, stack->size);
-}
-
-void
 t_clear_one_element_stack()
 {
   stack_push(stack, 10, &err);
@@ -185,6 +171,19 @@ t_clear_one_element_stack()
   TEST_ASSERT_EQUAL(0, stack->size);
 }
 
+void
+t_clear_stack_with_multiple_elements()
+{
+  stack_push(stack, 10, &err);
+  stack_push(stack, 10, &err);
+  stack_push(stack, 10, &err);
+  stack_push(stack, 10, &err);
+
+  stack_clear(stack, &err);
+
+  TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, stack->size);
+}
 
 void
 t_push_after_clearing()
@@ -216,8 +215,9 @@ int main(void){
   RUN_TEST(t_pop_one_element_stack);
   RUN_TEST(t_push_to_stack_after_pop_last_elememt);
   RUN_TEST(t_clear_empty_stack);
-  RUN_TEST(t_clear_non_empty_stack);
   RUN_TEST(t_clear_one_element_stack);
+  RUN_TEST(t_clear_stack_with_multiple_elements);
+  RUN_TEST(t_push_after_clearing);
 
   return UNITY_END();
 }

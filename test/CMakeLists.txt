@@ -1,4 +1,4 @@
-set(UNITY_PATH path/to/unity/test/framework)
+set(UNITY_PATH /data/data/com.termux/files/home/sysTools/tools/Unity)
 set(TEST_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/bin/test)
 
 include_directories(${UNITY_PATH}/src)
@@ -8,4 +8,5 @@ target_include_directories(unity PUBLIC ${UNITY_PATH}/src)
 
 add_subdirectory(sl_list)
 add_subdirectory(stack)
+add_subdirectory(queue)
 
