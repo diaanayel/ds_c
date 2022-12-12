@@ -10,4 +10,4 @@ target_include_directories(unity PUBLIC ${UNITY_PATH}/src)
 #add_subdirectory(stack)
 #add_subdirectory(queue)
 
-add_subdirectory(queue_with_stack)
+add_subdirectory(queue_using_stack)
