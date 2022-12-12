@@ -2,7 +2,7 @@
 #include <squeue.h>
 
 SQueue*
-squeue_init()
+sq_init()
 {
   SQueue *squeue = malloc(sizeof(SQueue));
   if(!is_valid_squeue(squeue)) return NULL;
@@ -22,7 +22,7 @@ squeue_init()
 }
 
 void
-squeue_free(SQueue *squeue, int *err)
+sq_free(SQueue *squeue, int *err)
 {
   if(!is_valid_squeue(squeue)) return;
 
@@ -55,7 +55,7 @@ is_empty_squeue(const SQueue * const squeue, int *err)
 }
 
 void
-squeue_push(SQueue *squeue, int data, int *err)
+sq_push(SQueue *squeue, int data, int *err)
 {
   if(!is_valid_squeue(squeue))
   {
@@ -93,7 +93,7 @@ squeue_push(SQueue *squeue, int data, int *err)
 }
 
 void
-squeue_peek(const SQueue * const squeue, int *output, int *err)
+sq_peek(const SQueue * const squeue, int *output, int *err)
 {
   if(!is_valid_squeue(squeue))
   {
@@ -109,7 +109,7 @@ squeue_peek(const SQueue * const squeue, int *output, int *err)
 }
 
 void
-squeue_pop(SQueue * const squeue, int *output, int *err)
+sq_pop(SQueue * const squeue, int *output, int *err)
 {
   if(!is_valid_squeue(squeue))
   {
@@ -130,7 +130,7 @@ squeue_pop(SQueue * const squeue, int *output, int *err)
 }
 
 void
-squeue_clear(SQueue * const squeue, int *err)
+sq_clear(SQueue * const squeue, int *err)
 {
   if(!is_valid_squeue(squeue))
   {
@@ -146,7 +146,7 @@ squeue_clear(SQueue * const squeue, int *err)
   }
 
   while(!is_empty_squeue(squeue, err))
-    squeue_pop(squeue, NULL, err);
+    sq_pop(squeue, NULL, err);
 }
 
 
