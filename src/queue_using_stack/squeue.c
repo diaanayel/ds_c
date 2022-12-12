@@ -84,9 +84,6 @@ squeue_push(SQueue *squeue, int data, int *err)
     stack_push(squeue->s1, popped_data, err);
   }
 
-
-
-  printf(">>>>>>>> %d\n", squeue->s1->size);
   squeue->size++;
 }
 
@@ -114,8 +111,7 @@ squeue_pop(SQueue * const squeue, int *output, int *err)
     *err = SQUEUE_EMPTY;
     return;
   }
-
-  printf(">>> %d\n", squeue->s1->size);
+  
   stack_pop(squeue->s1, output, err);
   squeue->size--;
 }
