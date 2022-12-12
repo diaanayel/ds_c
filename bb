@@ -3,12 +3,13 @@
 cd ./build
 
 tg=$1
-file_to_run=$2
 
 clear && \
   cmake -DTARGET_GROUP=$1 .. && \
   cmake --build . && \
   printf "run(r): " && read opt
+
+printf "file to run: " && read file_to_run
 
 [[ $opt == "r" && $tg == "release" ]] && \
   ../bin/$file_to_run
