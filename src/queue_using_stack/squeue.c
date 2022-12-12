@@ -74,7 +74,12 @@ squeue_push(SQueue *squeue, int data, int *err)
     stack_pop(squeue->s1, &popped_data, err);
 
     stack_push(squeue->s2, popped_data, err);
+
+    // printf(">> %d , ", popped_data);
   }
+  // printf(">> done moving from s1 to s2\n");
+
+  stack_push(squeue->s1, data, err);
 
   while(!is_empty_stack(squeue->s2, err))
   {
@@ -82,7 +87,9 @@ squeue_push(SQueue *squeue, int data, int *err)
     stack_pop(squeue->s2, &popped_data, err);
 
     stack_push(squeue->s1, popped_data, err);
+    // printf(">> %d , ", popped_data);
   }
+  // printf(">> done moving from s2 to s1\n");
 
   squeue->size++;
 }
@@ -94,7 +101,8 @@ squeue_peek(const SQueue * const squeue, int *output, int *err)
 
   if(is_empty_squeue(squeue, err)) return;
 
-  stack_peek(squeue->s1, output, err);
+  if(output != NULL)
+    stack_peek(squeue->s1, output, err);
 }
 
 void
