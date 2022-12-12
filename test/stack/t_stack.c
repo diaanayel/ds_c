@@ -7,7 +7,7 @@ Stack *stack;
 
 void setUp (void) {
   err = 0;
-  stack = stack_init(&err);
+  stack = stack_init();
 }
 
 void tearDown (void) {

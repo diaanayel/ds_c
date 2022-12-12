@@ -1,1 +1,1 @@
-map <C-x> :! ./bb test t_squeue <CR>
+map <C-x> :! ./bb test <CR>

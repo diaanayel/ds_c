@@ -23,17 +23,17 @@ typedef struct
   Node *top;
 } Stack;
 
-Stack* stack_init(int*);
+Stack* stack_init();
 void stack_free(Stack*, int*);
 void stack_clear(Stack*, int*);
 
-void stack_push(Stack*, int, int*);
+void stack_push(Stack * const, int, int*);
 void stack_peek(const Stack * const, int*, int*);
 void stack_pop(Stack * const, int*, int*);
 
 
-bool is_valid_stack_node(const Node * const, int*);
-bool is_valid_stack(const Stack * const, int*);
-bool is_empty_stack(const Stack * const, int*);
+bool is_valid_stack_node(const Node * const);
+bool is_valid_stack(const Stack * const);
+bool is_empty_stack(const Stack * const);
 
 #endif
