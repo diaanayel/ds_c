@@ -1,1 +1,1 @@
-map <C-x> :! ./bb test stack <CR>
+map <C-x> :! ./bb test t_stack <CR>

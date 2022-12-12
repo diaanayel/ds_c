@@ -27,7 +27,7 @@ Stack* stack_init(int*);
 void stack_free(Stack*, int*);
 void stack_clear(Stack*, int*);
 
-void stack_push(Stack*, int, int*);
+void stack_push(Stack * const, int, int*);
 void stack_peek(const Stack * const, int*, int*);
 void stack_pop(Stack * const, int*, int*);
 

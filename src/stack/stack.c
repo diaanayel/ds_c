@@ -67,7 +67,7 @@ is_empty_stack(const Stack * const stack, int *err)
 }
 
 void
-stack_push(Stack *stack, int data, int *err)
+stack_push(Stack * const stack, int data, int *err)
 {
   if(!is_valid_stack(stack, err)) return;
 
