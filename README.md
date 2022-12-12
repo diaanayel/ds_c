@@ -20,9 +20,9 @@
   * the default mapping is <C-x>
   * change the task to the needed one in it
 
-* **bb** now accepts 2 parameters:
-  * the first for the build group
-  * the second for the task to be run after build
+* **bb** :
+  * now accepts one argument which is the build group
+  * after building, it asks for the executable to run
 
 
 **any comments or advices appreciated !**
