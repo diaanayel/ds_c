@@ -1,11 +1,11 @@
 add_library(stack ${PROJECT_SOURCE_DIR}/src/stack/stack.c)
-add_library(fsqueue ${PROJECT_SOURCE_DIR}/src/queue_using_stack/fsqueue.c)
+add_library(amqueue ${PROJECT_SOURCE_DIR}/src/queue_using_stack/amqueue.c)
 
-target_link_libraries(fsqueue stack)
+target_link_libraries(amqueue stack)
 
-add_executable(t_fsqueue t_fsqueue.c)
+add_executable(t_amqueue t_amqueue.c)
 
-target_link_libraries(t_fsqueue fsqueue unity)
+target_link_libraries(t_amqueue amqueue unity)
 
-add_test(t_fsqueue ${TEST_OUTPUT_PATH}/t_fsqueue)
+add_test(t_amqueue ${TEST_OUTPUT_PATH}/t_amqueue)
 
