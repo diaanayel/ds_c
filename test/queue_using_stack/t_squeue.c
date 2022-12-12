@@ -1,34 +1,15 @@
-#include "unity_internals.h"
 #include <unity.h>
 #include <squeue.h>
 
-/* visualization of steps canbe checkes using printfs in any function
- */
-
-
-// can not be left for test because it'll cause problems with the cleanUp()
-/*
-void
-t_init_and_free()
-{
-  SQueue *sq = squeue_init(&err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_NOT_EQUAL(NULL, sq);
-  TEST_ASSERT_NOT_EQUAL(NULL, sq->s1);
-  TEST_ASSERT_NOT_EQUAL(NULL, sq->s2);
-  TEST_ASSERT_EQUAL(0, sq->size);
-
-  squeue_free(sq, &err);
-}
-*/
+// visualization of steps canbe checkes using printfs in any function
+// memory tests should be done !
 
 int err;
 SQueue *squeue;
 
 void setUp (void) {
-  int err = 0;
-  squeue = squeue_init(&err);
+  err = 0;
+  squeue = squeue_init();
 }
 
 void tearDown (void) {
@@ -127,7 +108,7 @@ t_pop_non_empty_squeue()
 
   squeue_pop(squeue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);  // problem from stack !
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
   TEST_ASSERT_EQUAL(20, squeue->s1->top->data);
 }
@@ -145,8 +126,21 @@ t_pop_till_clear()
   squeue_pop(squeue, &x, &err);
   squeue_pop(squeue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);  // problem from stack !
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(30, x);
+  TEST_ASSERT_EQUAL(0, squeue->size);
+}
+
+void
+t_clear()
+{
+  squeue_push(squeue, 10, &err);
+  squeue_push(squeue, 20, &err);
+  squeue_push(squeue, 30, &err);
+
+  squeue_clear(squeue, &err);
+
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(0, squeue->size);
 }
 
@@ -166,8 +160,8 @@ t_push_after_clearing()
   squeue_push(squeue, 10, &err);
   squeue_push(squeue, 30, &err);
 
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, squeue->s1->top->data);
-
 }
 
 int main(void){
@@ -184,6 +178,7 @@ int main(void){
   RUN_TEST(t_pop_non_empty_squeue);
   RUN_TEST(t_pop_till_clear);
   RUN_TEST(t_push_after_clearing);
+  RUN_TEST(t_clear);
 
   return UNITY_END();
 }

@@ -2,16 +2,16 @@
 #include <squeue.h>
 
 SQueue*
-squeue_init(int *err)
+squeue_init()
 {
   SQueue *squeue = malloc(sizeof(SQueue));
-  if(!is_valid_squeue(squeue, err)) return NULL;
+  if(!is_valid_squeue(squeue)) return NULL;
   
-  Stack *s1 = stack_init(err);
-  if(!is_valid_stack(s1, err)) return NULL;
+  Stack *s1 = stack_init();
+  if(!is_valid_stack(s1)) return NULL;
 
-  Stack *s2 = stack_init(err);
-  if(!is_valid_stack(s2, err)) return NULL;
+  Stack *s2 = stack_init();
+  if(!is_valid_stack(s2)) return NULL;
 
   squeue->s1 = s1;
   squeue->s2 = s2;
@@ -24,7 +24,7 @@ squeue_init(int *err)
 void
 squeue_free(SQueue *squeue, int *err)
 {
-  if(!is_valid_squeue(squeue, err)) return;
+  if(!is_valid_squeue(squeue)) return;
 
   stack_free(squeue->s1, err);
   stack_free(squeue->s2, err);
@@ -35,31 +35,34 @@ squeue_free(SQueue *squeue, int *err)
 }
 
 bool
-is_valid_squeue(const SQueue * const squeue, int *err)
+is_valid_squeue(const SQueue * const squeue)
 {
-  if(squeue == NULL)
-  {
-    if(err != NULL)
-      *err = SQUEUE_NULL;
-    return false;
-  }
-
-  return true;
+  return (squeue != NULL);
 }
 
 bool
 is_empty_squeue(const SQueue * const squeue, int *err)
 {
-  if(!is_valid_squeue(squeue, err)) return SQUEUE_NULL;
+  if(!is_valid_squeue(squeue))
+  {
+    if(err != NULL)
+      *err = SQUEUE_NULL;
+    return SQUEUE_NULL;
+  }
 
-  return (is_empty_stack(squeue->s1, err) &&
-          is_empty_stack(squeue->s2, err));
+  return (is_empty_stack(squeue->s1) &&
+          is_empty_stack(squeue->s2));
 }
 
 void
 squeue_push(SQueue *squeue, int data, int *err)
 {
-  if(!is_valid_squeue(squeue, err)) return;
+  if(!is_valid_squeue(squeue))
+  {
+    if(err != NULL)
+      *err = SQUEUE_NULL;
+    return;
+  }
 
   if(is_empty_squeue(squeue, err))
   {
@@ -68,28 +71,23 @@ squeue_push(SQueue *squeue, int data, int *err)
     return;
   }
 
-  while(!is_empty_stack(squeue->s1, err))
+  while(!is_empty_stack(squeue->s1))
   {
     int popped_data;
     stack_pop(squeue->s1, &popped_data, err);
 
     stack_push(squeue->s2, popped_data, err);
-
-    // printf(">> %d , ", popped_data);
   }
-  // printf(">> done moving from s1 to s2\n");
 
   stack_push(squeue->s1, data, err);
 
-  while(!is_empty_stack(squeue->s2, err))
+  while(!is_empty_stack(squeue->s2))
   {
     int popped_data;
     stack_pop(squeue->s2, &popped_data, err);
 
     stack_push(squeue->s1, popped_data, err);
-    // printf(">> %d , ", popped_data);
   }
-  // printf(">> done moving from s2 to s1\n");
 
   squeue->size++;
 }
@@ -97,7 +95,12 @@ squeue_push(SQueue *squeue, int data, int *err)
 void
 squeue_peek(const SQueue * const squeue, int *output, int *err)
 {
-  if(!is_valid_squeue(squeue, err)) return;
+  if(!is_valid_squeue(squeue))
+  {
+    if(err != NULL)
+      *err = SQUEUE_NULL;
+    return;
+  }
 
   if(is_empty_squeue(squeue, err)) return;
 
@@ -108,15 +111,17 @@ squeue_peek(const SQueue * const squeue, int *output, int *err)
 void
 squeue_pop(SQueue * const squeue, int *output, int *err)
 {
-  if(!is_valid_squeue(squeue, err))
+  if(!is_valid_squeue(squeue))
   {
-    *err = SQUEUE_NULL;
+    if(err != NULL)
+      *err = SQUEUE_NULL;
     return;
   }
 
   if(is_empty_squeue(squeue, err))
   {
-    *err = SQUEUE_EMPTY;
+    if(err != NULL)
+      *err = SQUEUE_EMPTY;
     return;
   }
   
@@ -124,7 +129,24 @@ squeue_pop(SQueue * const squeue, int *output, int *err)
   squeue->size--;
 }
 
+void
+squeue_clear(SQueue * const squeue, int *err)
+{
+  if(!is_valid_squeue(squeue))
+  {
+    if(err != NULL)
+      *err = SQUEUE_NULL;
+    return;
+  }
+  if(is_empty_squeue(squeue, err))
+  {
+    if(err != NULL)
+      *err = SQUEUE_EMPTY;
+    return;
+  }
 
-
+  while(!is_empty_squeue(squeue, err))
+    squeue_pop(squeue, NULL, err);
+}
 
 

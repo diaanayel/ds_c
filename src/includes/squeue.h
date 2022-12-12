@@ -20,14 +20,18 @@ typedef struct{
 } SQueue;
 
 
-SQueue* squeue_init(int*);
-bool is_valid_squeue(const SQueue * const, int*);
+SQueue* squeue_init();
+void squeue_free(SQueue*, int*);
+void squeue_clear(SQueue * const, int*);
+
+bool is_valid_squeue(const SQueue * const);
 bool is_empty_squeue(const SQueue * const, int*);
 void squeue_free(SQueue*, int*);
 
-void squeue_push(SQueue*, int, int*);
+void squeue_push(SQueue * const, int, int*);
 void squeue_peek(const SQueue * const, int*, int*);
 void squeue_pop(SQueue * const, int*, int*);
+
 
 
 #endif
