@@ -1,11 +1,10 @@
 #include <stack.h>
 
-
 Stack*
-stack_init(int *err)
+stack_init()
 {
   Stack *stack = malloc(sizeof(Stack));
-  if(!is_valid_stack(stack, err)) return NULL;
+  if(!is_valid_stack(stack)) return NULL;
 
   stack->size = 0;
   stack->top = NULL;
@@ -16,7 +15,12 @@ stack_init(int *err)
 void
 stack_free(Stack *stack, int *err)
 {
-  if(!is_valid_stack(stack, err)) return;
+  if(!is_valid_stack(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return;
+  }
 
   Node *holder;
   
@@ -33,46 +37,42 @@ stack_free(Stack *stack, int *err)
 }
 
 bool
-is_valid_stack_node(const Node * const node, int *err)
+is_valid_stack_node(const Node * const node)
 {
-  if(node == NULL)
-  {
-    if(err != NULL)
-      *err = STACK_NODE_NULL;
-    return false;
-  }
-
-  return true;
+  return node != NULL;
 }
 
 bool
-is_valid_stack(const Stack * const stack, int *err)
+is_valid_stack(const Stack * const stack)
 {
-  if(stack == NULL)
-  {
-    if(err != NULL)
-      *err = STACK_NULL;
-    return false;
-  }
-
-  return true;
+  return stack != NULL;
 }
 
 bool
-is_empty_stack(const Stack * const stack, int *err)
+is_empty_stack(const Stack * const stack)
 {
-  if(!is_valid_stack(stack, err)) return STACK_NULL;
+  if(!is_valid_stack(stack)) return STACK_NULL;
 
-  return (stack->size == 0 && stack->top == NULL) ;
+  return (stack->size == 0) ;
 }
 
 void
 stack_push(Stack * const stack, int data, int *err)
 {
-  if(!is_valid_stack(stack, err)) return;
+  if(!is_valid_stack(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return;
+  }
 
   Node *new_top = malloc(sizeof(Node));
-  if(!is_valid_stack_node(new_top, err)) return;
+  if(!is_valid_stack_node(new_top))
+  {
+    if(err != NULL)
+      *err = STACK_NODE_NULL;
+    return;
+  }
 
   new_top->data = data;
   new_top->next = stack->top;
@@ -83,9 +83,14 @@ stack_push(Stack * const stack, int data, int *err)
 void
 stack_peek(const Stack * const stack, int *output,int *err)
 {
-  if(!is_valid_stack(stack, err)) return;
+  if(!is_valid_stack(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return;
+  }
 
-  if(is_empty_stack(stack, err))
+  if(is_empty_stack(stack))
   {
     if(err != NULL)
       *err = STACK_EMPTY;
@@ -99,9 +104,14 @@ stack_peek(const Stack * const stack, int *output,int *err)
 void
 stack_pop(Stack * const stack, int *output,int *err)
 {
-  if(!is_valid_stack(stack, err)) return;
+  if(!is_valid_stack(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return;
+  }
 
-  if(is_empty_stack(stack, err))
+  if(is_empty_stack(stack))
   {
     if(err != NULL)
       *err = STACK_EMPTY;
@@ -112,7 +122,6 @@ stack_pop(Stack * const stack, int *output,int *err)
     *output = stack->top->data;
 
   Node *node_to_remove = stack->top;
-  if(!is_valid_stack_node(node_to_remove, err)) return;
 
   stack->top = stack->top->next;
 
@@ -124,9 +133,14 @@ stack_pop(Stack * const stack, int *output,int *err)
 void
 stack_clear(Stack *stack, int *err)
 {
-  if(!is_valid_stack(stack, err)) return;
+  if(!is_valid_stack(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return;
+  }
 
-  if(is_empty_stack(stack, err))
+  if(is_empty_stack(stack))
   {
     if(err != NULL)
       *err = STACK_EMPTY;
