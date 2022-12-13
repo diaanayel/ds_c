@@ -1,4 +1,6 @@
+#include "queue.h"
 #include <gmqueue.h>
+#include <stdbool.h>
 
 
 GMQueue*
@@ -35,12 +37,6 @@ gmq_free(GMQueue *gmqueue, int *err)
 }
 
 bool
-is_valid_gmq_node(const Node * const node)
-{
-  return (node != NULL);
-}
-
-bool
 is_valid_gmqueue(const GMQueue * const gmqueue)
 {
   return (gmqueue != NULL);
@@ -68,17 +64,23 @@ gmq_push(GMQueue *gmqueue, int data, int *err)
     
     return;
   }
-
-
-
-  /*
-  12  q, minq
-  5   
   
-  */
+  int min;
+  queue_peek(gmqueue->minq, &min, err);
 
+  while(data < min)
+  {
+    queue_pop(gmqueue->minq, NULL, err);
+    queue_peek(gmqueue->minq, &min, err);
+
+    if(is_empty_queue(gmqueue->minq, err))
+      break;
+  }
   
+  queue_push(gmqueue->queue, data, err);
+  queue_push(gmqueue->minq, data, err);
 
+  gmqueue->size++;
 }
 
 void
@@ -92,7 +94,21 @@ gmq_peek(const GMQueue * const gmqueue, int *output,int *err)
       *err = GMQUEUE_EMPTY;
     return;
   }
+  queue_peek(gmqueue->queue, output, err);
+}
 
+void
+gmq_get_min(const GMQueue * const gmqueue, int *output,int *err)
+{
+  if(!is_valid_gmqueue(gmqueue)) return;
+
+  if(is_empty_gmqueue(gmqueue, err))
+  {
+    if(err != NULL)
+      *err = GMQUEUE_EMPTY;
+    return;
+  }
+  queue_peek(gmqueue->minq, output, err);
 }
 
 void
@@ -107,6 +123,17 @@ gmq_pop(GMQueue * const gmqueue, int *output,int *err)
     return;
   }
 
+  int min, first;
+  queue_pop(gmqueue->queue, &first, err);
+  queue_peek(gmqueue->minq, &min, err);
+
+  if(min == first)
+    queue_pop(gmqueue->minq, NULL, err);
+
+  if(output)
+    *output = first;
+
+  gmqueue->size--;
 }
 
 void
@@ -121,5 +148,7 @@ gmq_clear(GMQueue *gmqueue, int *err)
     return;
   }
 
+  while(!is_empty_gmqueue(gmqueue, err))
+    gmq_pop(gmqueue, NULL, err);
 }
 
