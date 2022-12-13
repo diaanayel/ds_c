@@ -9,12 +9,12 @@ gmq_init()
   GMQueue *gmqueue = malloc(sizeof(GMQueue));
   if(!is_valid_gmqueue(gmqueue)) return NULL;
 
-  Queue *queue = queue_init(NULL);
-  if(!is_valid_queue(queue, NULL)) return NULL;
+  Queue *queue = queue_init();
+  if(!is_valid_queue(queue)) return NULL;
   
 
-  Queue *minq = queue_init(NULL);
-  if(!is_valid_queue(minq, NULL)) return NULL;
+  Queue *minq = queue_init();
+  if(!is_valid_queue(minq)) return NULL;
 
   gmqueue->queue = queue;
   gmqueue->minq = minq;
@@ -45,7 +45,11 @@ is_valid_gmqueue(const GMQueue * const gmqueue)
 bool
 is_empty_gmqueue(const GMQueue * const gmqueue, int *err)
 {
-  if(!is_valid_gmqueue(gmqueue)) return GMQUEUE_NULL;
+  if(!is_valid_gmqueue(gmqueue))
+  {
+    if(err) *err = GMQUEUE_NULL;
+    return GMQUEUE_NULL;
+  }
 
   return (gmqueue->size == 0);
 }
@@ -53,7 +57,11 @@ is_empty_gmqueue(const GMQueue * const gmqueue, int *err)
 void
 gmq_push(GMQueue *gmqueue, int data, int *err)
 {
-  if(!is_valid_gmqueue(gmqueue)) return;
+  if(!is_valid_gmqueue(gmqueue))
+  {
+    if(err) *err = GMQUEUE_NULL;
+    return;
+  }
 
   if(is_empty_gmqueue(gmqueue, err))
   {
@@ -64,19 +72,20 @@ gmq_push(GMQueue *gmqueue, int data, int *err)
     
     return;
   }
-  
+
   int min;
   queue_peek(gmqueue->minq, &min, err);
-
-  while(data < min)
+  
+  while(!(is_empty_queue(gmqueue->minq, err)))
   {
-    queue_pop(gmqueue->minq, NULL, err);
     queue_peek(gmqueue->minq, &min, err);
 
-    if(is_empty_queue(gmqueue->minq, err))
+    if(data > min)
       break;
+
+    queue_pop(gmqueue->minq, &min, err);
   }
-  
+
   queue_push(gmqueue->queue, data, err);
   queue_push(gmqueue->minq, data, err);
 

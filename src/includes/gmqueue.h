@@ -23,7 +23,7 @@ GMQueue* gmq_init();
 void gmq_free(GMQueue*, int*);
 void gmq_clear(GMQueue*, int*);
 
-void gmq_push(GMQueue*, int, int*);
+void gmq_push(GMQueue * const, int, int*);
 void gmq_peek(const GMQueue * const, int*, int*);
 void gmq_pop(GMQueue * const, int*, int*);
 void gmq_get_min(const GMQueue * const, int*, int*);

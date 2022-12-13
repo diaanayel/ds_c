@@ -4,7 +4,6 @@
 
 // visualization of steps canbe checkes using printfs in any function
 // memory tests should be done !
-// err returns code if empty in queue_is_empty, look at it, if done and foud this node, remove it !
 
 int err;
 GMQueue *gmqueue;
@@ -55,7 +54,7 @@ t_push_one_smaller_element_to_non_empty()
   gmq_push(gmqueue, 10, &err);
   gmq_push(gmqueue, 5, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(2, gmqueue->size);
   TEST_ASSERT_EQUAL(1, gmqueue->minq->size);
   TEST_ASSERT_EQUAL(2, gmqueue->queue->size);
@@ -73,7 +72,7 @@ t_push_multiple_elements_to_non_empty()
   gmq_push(gmqueue, 3, &err);
   gmq_push(gmqueue, 4, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(4, gmqueue->size);
   TEST_ASSERT_EQUAL(2, gmqueue->minq->size);
   TEST_ASSERT_EQUAL(4, gmqueue->queue->size);
@@ -143,7 +142,7 @@ t_pop_one_element_gmqueue()
 
   gmq_pop(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
   TEST_ASSERT_EQUAL(0, gmqueue->size);
 }
@@ -158,7 +157,7 @@ t_get_min_after_pop_bigger_element()
 
   gmq_pop(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
   TEST_ASSERT_EQUAL(1, gmqueue->size);
 
@@ -179,12 +178,12 @@ t_get_min_after_pop_smaller_element()
 
   gmq_pop(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
 
   gmq_get_min(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(4, x);
 }
 
@@ -198,13 +197,13 @@ t_pop_two_elemnt_gmqueue()
 
   gmq_pop(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
   TEST_ASSERT_EQUAL(1, gmqueue->size);
 
   gmq_pop(gmqueue, &x, &err);
 
-  // TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(20, x);
   TEST_ASSERT_EQUAL(0, gmqueue->size);
 }
@@ -246,6 +245,35 @@ t_push_after_clearing()
   TEST_ASSERT_EQUAL(10, x);
 }
 
+void
+t_passing_err_handler_as_null()
+{
+  int x;
+  gmq_push(gmqueue, 10, NULL);
+  gmq_clear(gmqueue, NULL);
+  gmq_pop(gmqueue, &x, NULL);
+  gmq_peek(gmqueue, &x, NULL);
+}
+
+void
+t_passing_outputVar_as_null()
+{
+  gmq_push(gmqueue, 10, NULL);
+  gmq_clear(gmqueue, NULL);
+  gmq_pop(gmqueue, NULL, NULL);
+  gmq_peek(gmqueue, NULL, NULL);
+}
+
+void
+t_passing_gmq_as_null()
+{
+  gmq_push(NULL, 10, NULL);
+  gmq_clear(NULL, NULL);
+  gmq_pop(NULL, NULL, NULL);
+  gmq_peek(NULL, NULL, NULL);
+}
+
+
 int main(void){
   UNITY_BEGIN();
 
@@ -265,6 +293,9 @@ int main(void){
   RUN_TEST(t_pop_two_elemnt_gmqueue);
   RUN_TEST(t_clear);
   RUN_TEST(t_push_after_clearing);
+  RUN_TEST(t_passing_err_handler_as_null);
+  RUN_TEST(t_passing_outputVar_as_null);
+  RUN_TEST(t_passing_gmq_as_null);
 
   return UNITY_END();
 }
