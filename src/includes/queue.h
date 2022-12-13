@@ -24,7 +24,7 @@ typedef struct
   Node *tail;
 } Queue;
 
-Queue* queue_init(int*);
+Queue* queue_init();
 void queue_free(Queue*, int*);
 void queue_clear(Queue*, int*);
 
@@ -32,10 +32,10 @@ void queue_push(Queue*, int, int*);
 void queue_peek(const Queue * const, int*, int*);
 void queue_pop(Queue * const, int*, int*);
 
-void queue_push_to_empty(Queue*, int, int*);
+void queue_push_to_empty(Queue * const, int, int*);
 
-bool is_valid_queue_node(const Node * const, int*);
-bool is_valid_queue(const Queue * const, int*);
+bool is_valid_queue_node(const Node * const);
+bool is_valid_queue(const Queue * const);
 bool is_empty_queue(const Queue * const, int*);
 
 #endif

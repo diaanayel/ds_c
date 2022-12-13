@@ -1,11 +1,10 @@
 #include <queue.h>
 
-
 Queue*
-queue_init(int *err)
+queue_init()
 {
   Queue *queue = malloc(sizeof(Queue));
-  if(!is_valid_queue(queue, err)) return NULL;
+  if(!is_valid_queue(queue)) return NULL;
 
   queue->size = 0;
   queue->head = NULL;
@@ -17,7 +16,7 @@ queue_init(int *err)
 void
 queue_free(Queue *queue, int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
 
   Node *holder;
   
@@ -31,52 +30,42 @@ queue_free(Queue *queue, int *err)
     holder = NULL;
   }
 
-  queue->tail = NULL;
   free(queue);
   queue = NULL;
 }
 
 bool
-is_valid_queue_node(const Node * const node, int *err)
+is_valid_queue_node(const Node * const node)
 {
-  if(node == NULL)
-  {
-    if(err != NULL)
-      *err = QUEUE_NODE_NULL;
-    return false;
-  }
-
-  return true;
+  return (node != NULL);
 }
 
 bool
-is_valid_queue(const Queue * const queue, int *err)
+is_valid_queue(const Queue * const queue)
 {
-  if(queue == NULL)
-  {
-    if(err != NULL)
-      *err = QUEUE_NULL;
-    return false;
-  }
-
-  return true;
+  return (queue != NULL);
 }
 
 bool
 is_empty_queue(const Queue * const queue, int *err)
 {
-  if(!is_valid_queue(queue, err)) return QUEUE_NULL;
+  if(!is_valid_queue(queue))
+  {
+    if(err)
+      *err = QUEUE_NULL;
+    return QUEUE_NULL;
+  }
 
-  return (queue->size == 0 && queue->head == NULL) ;
+  return (queue->size == 0);
 }
 
 void
 queue_push_to_empty(Queue *queue, int data, int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
   
   Node *node = malloc(sizeof(Node));
-  if(!is_valid_queue_node(node, err)) return;
+  if(!is_valid_queue_node(node)) return;
 
   node->data = data;
   node->next = NULL;
@@ -89,7 +78,7 @@ queue_push_to_empty(Queue *queue, int data, int *err)
 void
 queue_push(Queue *queue, int data, int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
 
   if(is_empty_queue(queue, err))
   {
@@ -97,21 +86,21 @@ queue_push(Queue *queue, int data, int *err)
     return;
   }
 
-  Node *new_tail = malloc(sizeof(Node));
-  if(!is_valid_queue_node(new_tail, err)) return;
+  Node *node = malloc(sizeof(Node));
+  if(!is_valid_queue_node(node)) return;
 
-  new_tail->data = data;
-  new_tail->next = NULL;
+  node->data = data;
+  node->next = NULL;
 
-  queue->tail->next = new_tail;
-  queue->tail = new_tail;
+  queue->tail->next = node;
+  queue->tail = node;
   queue->size++;
 }
 
 void
 queue_peek(const Queue * const queue, int *output,int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
 
   if(is_empty_queue(queue, err))
   {
@@ -127,7 +116,7 @@ queue_peek(const Queue * const queue, int *output,int *err)
 void
 queue_pop(Queue * const queue, int *output,int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
 
   if(is_empty_queue(queue, err))
   {
@@ -137,7 +126,7 @@ queue_pop(Queue * const queue, int *output,int *err)
   }
 
   Node *node_to_remove = queue->head;
-  if(!is_valid_queue_node(node_to_remove, err)) return;
+  if(!is_valid_queue_node(node_to_remove)) return;
 
   if(output != NULL)
    *output = node_to_remove->data;
@@ -152,7 +141,7 @@ queue_pop(Queue * const queue, int *output,int *err)
 void
 queue_clear(Queue *queue, int *err)
 {
-  if(!is_valid_queue(queue, err)) return;
+  if(!is_valid_queue(queue)) return;
 
   if(is_empty_queue(queue, err))
   {
@@ -162,7 +151,7 @@ queue_clear(Queue *queue, int *err)
   }
 
   Node *holder = queue->head;
-  if(!is_valid_queue_node(holder, err)) return;
+  if(!is_valid_queue_node(holder)) return;
 
   while(queue->size != 0)
     queue_pop(queue, NULL, err);

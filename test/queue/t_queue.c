@@ -2,12 +2,16 @@
 #include <unity.h>
 #include <queue.h>
 
+// memory leaks should be confirmed negative in addition to these tests !
+//
+
+
 int err;
 Queue *queue;
 
 void setUp (void) {
   err = 0;
-  queue = queue_init(&err);
+  queue = queue_init();
 }
 
 void tearDown (void) {
@@ -19,44 +23,6 @@ t_test_environment()
 {
   TEST_ASSERT_EQUAL(1, 1);
 }
-
-// can not be left for test because it'll cause problems with the cleanUp()
-/*
-void
-t_queue_init()
-{
-  err = 0;
-  Queue *queue_temp = queue_init(&err);
-
-  TEST_ASSERT_NOT_EQUAL(NULL, queue_temp);
-  TEST_ASSERT_EQUAL(0, queue_temp->size);
-  TEST_ASSERT_EQUAL(0, queue_temp->head);
-  TEST_ASSERT_EQUAL(0, queue_temp->tail);
-  TEST_ASSERT_EQUAL(0, err);
-
-  queue_free(queue_temp, &err);
-}
-*/
-
-// can not be left for test because it'll cause problems with the cleanUp()
-// freeing should be confirmed with a tool like valfrind
-/*
-void
-t_queue_free()
-{
-  err = 0;
-  Queue *queue_temp = queue_init(&err);
-
-  TEST_ASSERT_NOT_EQUAL(NULL, queue_temp);
-  TEST_ASSERT_EQUAL(0, queue_temp->size);
-  TEST_ASSERT_EQUAL(0, err);
-
-  queue_free(queue_temp, &err);
-
-  TEST_ASSERT_EQUAL(NULL, queue);
-  TEST_ASSERT_EQUAL(0, err);
-}
-*/
 
 void
 t_push_to_empty_queue()
@@ -278,6 +244,34 @@ t_push_after_clearing()
   TEST_ASSERT_EQUAL(60, queue->tail->data);
 }
 
+void
+t_passing_err_handler_as_null()
+{
+  int x;
+  queue_push(queue, 10, NULL);
+  queue_clear(queue, NULL);
+  queue_pop(queue, &x, NULL);
+  queue_peek(queue, &x, NULL);
+}
+
+void
+t_passing_outputVar_as_null()
+{
+  queue_push(queue, 10, NULL);
+  queue_clear(queue, NULL);
+  queue_pop(queue, NULL, NULL);
+  queue_peek(queue, NULL, NULL);
+}
+
+void
+t_passing_queue_as_null()
+{
+  queue_push(NULL, 10, NULL);
+  queue_clear(NULL, NULL);
+  queue_pop(NULL, NULL, NULL);
+  queue_peek(NULL, NULL, NULL);
+}
+
 int main(void){
   UNITY_BEGIN();
 
@@ -298,6 +292,9 @@ int main(void){
   RUN_TEST(t_clear_one_element_queue);
   RUN_TEST(t_clear_non_empty_queue);
   RUN_TEST(t_push_after_clearing);
+  RUN_TEST(t_passing_err_handler_as_null);
+  RUN_TEST(t_passing_outputVar_as_null);
+  RUN_TEST(t_passing_queue_as_null);
 
   return UNITY_END();
 }
