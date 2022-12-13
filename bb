@@ -12,7 +12,7 @@ clear && \
 printf "file to run: " && read file_to_run
 
 [[ $opt == "r" && $tg == "release" ]] && \
-  ../bin/$file_to_run
+  ../bin/release/$file_to_run
 
 [[ $opt == "r" && $tg == "test" ]] && clear && \
   ../bin/test/$file_to_run | \
