@@ -1,3 +1,4 @@
+#include "unity_internals.h"
 #include <unity.h>
 #include <tree.h>
 
@@ -56,7 +57,6 @@ t_push_one_smaller_element_to_non_empty()
   TEST_ASSERT_EQUAL(5, tree->root->lt->data);
 }
 
-
 void
 t_push_two_elements_to_non_empty()
 {
@@ -85,51 +85,60 @@ t_push_multiple_elements()
   TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(7, tree->size);
 
-  tree_visualize(tree, &err);
+  // tree_visualize(tree, &err);
 }
 
-/*
-
 void
-t_peek_empty_tree()
+t_search_empty_tree()
 {
-  int x = 0;
-  tree_peek(tree, &x, &err);
+  tree_search(tree, 10, &err);
 
+  TEST_ASSERT_EQUAL(false, tree_search(tree, 10, &err));
   TEST_ASSERT_EQUAL(TREE_EMPTY, err);
-  TEST_ASSERT_EQUAL(0, x);
 }
 
 void
-t_peek_non_empty_tree()
+t_search_for_non_existing_item_non_empty_tree()
 {
-  int x = 0;
-  
   tree_push(tree, 10, &err);
   tree_push(tree, 20, &err);
   tree_push(tree, 30, &err);
   tree_push(tree, 40, &err);
 
-  tree_peek(tree, &x, &err);
-
+  TEST_ASSERT_EQUAL(false, tree_search(tree, 100, &err));
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(10, x);
 }
 
 void
-t_get_min()
+t_search_for_existing_item_non_empty_tree()
 {
   tree_push(tree, 10, &err);
   tree_push(tree, 20, &err);
-  tree_push(tree, 3, &err);
-  tree_push(tree, 4, &err);
+  tree_push(tree, 30, &err);
+  tree_push(tree, 40, &err);
 
-  int x;
-  tree_get_min(tree, &x, &err);
-
-  TEST_ASSERT_EQUAL(3, x);
+  TEST_ASSERT_EQUAL(true, tree_search(tree, 10, &err));
+  TEST_ASSERT_EQUAL(0, err);
 }
 
+void
+t_search_far_element_non_empty()
+{
+  tree_push(tree, 10, &err);
+  tree_push(tree, 8, &err);
+  tree_push(tree, 7, &err);
+  tree_push(tree, 9, &err);
+  tree_push(tree, 12, &err);
+  tree_push(tree, 11, &err);
+  tree_push(tree, 14, &err);
+
+  TEST_ASSERT_EQUAL(true, tree_search(tree, 12, &err));
+  TEST_ASSERT_EQUAL(true, tree_search(tree, 14, &err));
+  TEST_ASSERT_EQUAL(true, tree_search(tree, 9, &err));
+  TEST_ASSERT_EQUAL(0, err);
+}
+
+/*
 void
 t_pop_empty_tree()
 {
@@ -152,46 +161,6 @@ t_pop_one_element_tree()
   TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
   TEST_ASSERT_EQUAL(0, tree->size);
-}
-
-void
-t_get_min_after_pop_bigger_element()
-{
-  int x = 0;
-  
-  tree_push(tree, 10, &err);
-  tree_push(tree, 20, &err);
-
-  tree_pop(tree, &x, &err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(10, x);
-  TEST_ASSERT_EQUAL(1, tree->size);
-
-  tree_get_min(tree, &x, &err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(20, x);
-}
-
-void
-t_get_min_after_pop_smaller_element()
-{
-  int x = 0;
-  
-  tree_push(tree, 10, &err);
-  tree_push(tree, 20, &err);
-  tree_push(tree, 4, &err);
-
-  tree_pop(tree, &x, &err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(10, x);
-
-  tree_get_min(tree, &x, &err);
-
-  TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(4, x);
 }
 
 void
@@ -259,7 +228,7 @@ t_passing_err_handler_as_null()
   tree_push(tree, 10, NULL);
   tree_clear(tree, NULL);
   tree_pop(tree, &x, NULL);
-  tree_peek(tree, &x, NULL);
+  tree_search(tree, &x, NULL);
 }
 
 void
@@ -268,7 +237,7 @@ t_passing_outputVar_as_null()
   tree_push(tree, 10, NULL);
   tree_clear(tree, NULL);
   tree_pop(tree, NULL, NULL);
-  tree_peek(tree, NULL, NULL);
+  tree_search(tree, NULL, NULL);
 }
 
 void
@@ -277,7 +246,7 @@ t_passing_tree_as_null()
   tree_push(NULL, 10, NULL);
   tree_clear(NULL, NULL);
   tree_pop(NULL, NULL, NULL);
-  tree_peek(NULL, NULL, NULL);
+  tree_search(NULL, NULL, NULL);
 }
 */
 
@@ -291,13 +260,12 @@ int main(void){
   RUN_TEST(t_push_one_smaller_element_to_non_empty);
   RUN_TEST(t_push_two_elements_to_non_empty);
   RUN_TEST(t_push_multiple_elements);
-  // RUN_TEST(t_peek_empty_tree);
-  // RUN_TEST(t_peek_non_empty_tree);
-  // RUN_TEST(t_get_min);
+  RUN_TEST(t_search_empty_tree);
+  RUN_TEST(t_search_for_non_existing_item_non_empty_tree);
+  RUN_TEST(t_search_for_existing_item_non_empty_tree);
+  RUN_TEST(t_search_far_element_non_empty);
   // RUN_TEST(t_pop_empty_tree);
   // RUN_TEST(t_pop_one_element_tree);
-  // RUN_TEST(t_get_min_after_pop_bigger_element);
-  // RUN_TEST(t_get_min_after_pop_smaller_element);
   // RUN_TEST(t_pop_two_elemnt_tree);
   // RUN_TEST(t_clear);
   // RUN_TEST(t_push_after_clearing);

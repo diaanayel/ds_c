@@ -57,8 +57,6 @@ tree_is_empty(const Tree * const tree, int *err)
   return (tree->size == 0);
 }
 
-
-
 void
 tree_push(Tree *tree, int data, int *err)
 {
@@ -135,24 +133,54 @@ tree_visualize_node(const TNode * const node)
 {
   if(node)
   {
-    printf(" >>> %d", node->data);
+    printf(" %d -> \n", node->data);
 
-    tree_visualize_node(node->rt);
     tree_visualize_node(node->lt);
+    tree_visualize_node(node->rt);
   }
 }
 
-void
-tree_peek(const Tree * const tree, int *output,int *err)
+bool
+tree_search(const Tree * const tree, int target, int *err)
 {
-  if(!tree_is_valid(tree)) return;
+  if(!tree_is_valid(tree))
+  {
+    if(err != NULL)
+      *err = TREE_NULL;
+    return false;
+  }
 
   if(tree_is_empty(tree, err))
   {
     if(err != NULL)
       *err = TREE_EMPTY;
-    return;
+    return false;
   }
+
+  int steps = 0;
+  TNode *cur_node = tree->root;
+  while(true)
+  {
+    steps++;
+
+    if(!cur_node)
+      break;
+
+    if(target == cur_node->data)
+    {
+      printf("found: %d -> steps: %d\n", target, steps);
+      return true;
+    }
+
+    if(target < cur_node->data)
+      cur_node = cur_node->lt;
+
+    if(target > cur_node->data)
+      cur_node = cur_node->rt;
+  }
+
+  printf("not found: %d -> steps: %d\n", target, steps);
+  return false;
 }
 
 void

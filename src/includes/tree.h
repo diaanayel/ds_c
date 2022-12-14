@@ -32,7 +32,7 @@ void tree_visualize(const Tree * const, int*);
 void tree_visualize_node(const TNode * const);
 
 void tree_push(Tree * const, int, int*);
-void tree_peek(const Tree * const, int*, int*);
+bool tree_search(const Tree * const, int, int*);
 void tree_pop(Tree * const, int*, int*);
 void tree_get_min(const Tree * const, int*, int*);
 
