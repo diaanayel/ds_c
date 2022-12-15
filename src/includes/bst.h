@@ -23,6 +23,8 @@ void bst_visualize_node(const TNode);
 int bst_size(Bst);
 TNode bst_get_root(Bst, int*);
 void bst_get_node_data(TNode, int*, int*);
+int bst_get_min(const TNode, int*);
+int bst_remove_min_node(TNode, int*);
 
 void bst_insert(Bst const, int, int*);
 bool bst_search(const Bst, int, int*);

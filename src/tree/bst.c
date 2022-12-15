@@ -87,6 +87,61 @@ bst_is_valid_not_empty(const Bst tree, int *err)
   return true;
 }
 
+/////////////////////
+void
+bst_clear(Bst tree, int *err)
+{
+  if(!bst_is_valid(tree)) return;
+
+  if(bst_is_empty(tree, err))
+  {
+    if(err != NULL)
+      *err = BST_EMPTY;
+    return;
+  }
+
+}
+
+int
+bst_size(Bst tree)
+{
+  if(!bst_is_valid(tree))
+    return -1;
+
+  return (tree->size);
+}
+
+TNode
+bst_get_root(Bst tree, int *err)
+{
+  if(!bst_is_valid(tree))
+  {
+    if(err) *err = BST_NULL;
+    return NULL;
+  }
+
+  if(bst_is_empty(tree, err))
+  {
+    if(err) *err = BST_EMPTY;
+    return NULL;
+  }
+
+  return tree->root;
+}
+
+void
+bst_get_node_data(TNode node, int *output, int *err)
+{
+  if(!bst_is_valid_node(node))
+  {
+    if(err) *err = BST_NODE_NULL;
+    return;
+  }
+
+  if(output)
+    *output = node->data;
+}
+
 void
 bst_visualize(const Bst tree, int *err)
 {
@@ -118,6 +173,7 @@ bst_visualize_node(const TNode node)
   }
 }
 
+/////////////////////
 void
 bst_insert(Bst tree, int data, int *err)
 {
@@ -211,25 +267,40 @@ bst_remove(Bst tree, int target, int *err)
 
   while(cur_node)
   {
-    printf("cur: %d, prev: %d\n", cur_node->data, prev_node->data);
     if(target == cur_node->data)
     {
-      printf("found %d at ", cur_node->data);
       if(!(cur_node->rt) && !(cur_node->lt))
       {
         free(cur_node);
         if(target > prev_node->data)
-        {
-          printf("rt ");
           prev_node->rt = NULL;
-        }
         else
-        {
-          printf("lt ");
           prev_node->lt = NULL;
-        }
       }
-      printf("of %d\n", prev_node->data);
+      else if(cur_node->lt && !(cur_node->rt))
+      {
+        if(target > prev_node->data)
+          prev_node->rt = cur_node->lt;
+        else
+          prev_node->lt = cur_node->lt;
+
+        free(cur_node);
+      }
+      else if(cur_node->rt && !(cur_node->lt))
+      {
+        if(target > prev_node->data)
+          prev_node->rt = cur_node->rt;
+        else
+          prev_node->lt = cur_node->rt;
+
+        free(cur_node);
+      }
+      else
+      {
+        int min = bst_remove_min_node(cur_node->rt, err);
+        if(*err == 0)
+          prev_node->data =min;
+      }
       tree->size--;
       return true;
     }
@@ -242,59 +313,78 @@ bst_remove(Bst tree, int target, int *err)
     if(target > cur_node->data)
       cur_node = cur_node->rt;
   }
+
   return false;
 }
 
-void
-bst_clear(Bst tree, int *err)
-{
-  if(!bst_is_valid(tree)) return;
-
-  if(bst_is_empty(tree, err))
-  {
-    if(err != NULL)
-      *err = BST_EMPTY;
-    return;
-  }
-
-}
-
 int
-bst_size(Bst tree)
-{
-  if(!bst_is_valid(tree))
-    return -1;
-
-  return (tree->size);
-}
-
-TNode
-bst_get_root(Bst tree, int *err)
-{
-  if(!bst_is_valid(tree))
-  {
-    if(err) *err = BST_NULL;
-    return NULL;
-  }
-
-  if(bst_is_empty(tree, err))
-  {
-    if(err) *err = BST_EMPTY;
-    return NULL;
-  }
-
-  return tree->root;
-}
-
-void
-bst_get_node_data(TNode node, int *output, int *err)
+bst_get_min(const TNode node, int *err)
 {
   if(!bst_is_valid_node(node))
   {
     if(err) *err = BST_NODE_NULL;
-    return;
+    return 0;
   }
+  
+  TNode parent = node;
+  TNode min = parent;
 
-  if(output)
-    *output = node->data;
+  if(parent->lt)
+    min = parent->lt;
+  else if(parent->rt)
+    min = parent->rt;
+
+  while(true)
+  {
+    if(!(min->lt) && !(min->rt))
+      return min->data;
+
+    parent = min;
+    
+    if(min->lt)
+      min = min->lt;
+    else if(min->rt)
+      min = min->rt;
+  }
+}
+
+int
+bst_remove_min_node(TNode node, int *err)
+{
+  if(!bst_is_valid_node(node))
+  {
+    if(err) *err = BST_NODE_NULL;
+    return 0;
+  }
+  
+  TNode parent = node;
+  TNode min = parent;
+
+  if(parent->lt)
+    min = parent->lt;
+  else if(parent->rt)
+    min = parent->rt;
+
+  while(true)
+  {
+    if(!(min->lt) && !(min->rt))
+    {
+      int min_data = min->data;
+
+      if(min_data > parent->data)
+        parent->rt = NULL;
+      else
+        parent->lt = NULL;
+
+      free(min);
+      return min->data;
+    }
+
+    parent = min;
+    
+    if(min->lt)
+      min = min->lt;
+    else if(min->rt)
+      min = min->rt;
+  }
 }
