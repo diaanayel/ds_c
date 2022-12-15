@@ -91,40 +91,23 @@ bst_is_valid_not_empty(const Bst tree, int *err)
 void
 bst_clear(Bst tree, int *err)
 {
-  if(!bst_is_valid(tree)) return;
+  if(!bst_is_valid_not_empty(tree, err)) return;
 
-  if(bst_is_empty(tree, err))
-  {
-    if(err != NULL)
-      *err = BST_EMPTY;
-    return;
-  }
-
+  bst_free_node(tree->root);
+  tree->root = NULL;
+  tree->size = 0;
 }
 
 int
 bst_size(Bst tree)
 {
-  if(!bst_is_valid(tree))
-    return -1;
-
-  return (tree->size);
+  return (bst_is_valid(tree) ? tree->size : -1);
 }
 
 TNode
 bst_get_root(Bst tree, int *err)
 {
-  if(!bst_is_valid(tree))
-  {
-    if(err) *err = BST_NULL;
-    return NULL;
-  }
-
-  if(bst_is_empty(tree, err))
-  {
-    if(err) *err = BST_EMPTY;
-    return NULL;
-  }
+  if(!bst_is_valid_not_empty(tree, err)) return NULL;
 
   return tree->root;
 }
@@ -173,6 +156,23 @@ bst_visualize_node(const TNode node)
   }
 }
 
+TNode
+bst_create_node(int data, int *err)
+{
+  TNode node = (TNode) malloc(sizeof(struct tnode));
+  if(!bst_is_valid_node(node))
+  {
+    if(err) *err = BST_NODE_NULL;
+    return NULL;
+  }
+
+  node->data = data;
+  node->rt = NULL;
+  node->lt = NULL;
+
+  return node;
+}
+
 /////////////////////
 void
 bst_insert(Bst tree, int data, int *err)
@@ -183,16 +183,7 @@ bst_insert(Bst tree, int data, int *err)
     return;
   }
 
-  TNode node = (TNode) malloc(sizeof(struct tnode));
-  if(!bst_is_valid_node(node))
-  {
-    if(err) *err = BST_NODE_NULL;
-    return;
-  }
-
-  node->data = data;
-  node->rt = NULL;
-  node->lt = NULL;
+  TNode node = bst_create_node(data, err);
 
   if(bst_is_empty(tree, err))
   {
@@ -204,25 +195,17 @@ bst_insert(Bst tree, int data, int *err)
   TNode cur_node = tree->root;
   while(true)
   {
-    if(data < cur_node->data)
+    if(data < cur_node->data && !(cur_node->lt))
     {
-      if(!(cur_node->lt))
-      {
-        cur_node->lt = node;
-        break;
-      }
-      cur_node = cur_node->lt;
+      cur_node->lt = node;
+      break;
     }
-
-    if(data > cur_node->data)
+    if(data > cur_node->data && !(cur_node->rt))
     {
-      if(!(cur_node->rt))
-      {
-        cur_node->rt = node;
-        break;
-      }
-      cur_node = cur_node->rt;
+      cur_node->rt = node;
+      break;
     }
+    cur_node = (data > cur_node->data ? cur_node->rt : cur_node->lt);
   }
   tree->size++;
 }
@@ -238,10 +221,7 @@ bst_search(const Bst tree, int target, int *err)
     if(target == cur_node->data)
       return true;
 
-    if(target < cur_node->data)
-      cur_node = cur_node->lt;
-    else
-      cur_node = cur_node->rt;
+    cur_node = (target > cur_node->data ? cur_node->rt : cur_node->lt);
   }
   return false;
 }
@@ -251,101 +231,40 @@ bst_remove(Bst tree, int target, int *err)
 {
   if(!bst_is_valid_not_empty(tree, err)) return false;
 
-  if(tree->size == 1)
-  {
-    if(target == tree->root->data)
-    {
-      free(tree->root);
-      tree->root = NULL;
-      tree->size--;
-      return true;
-    }
-    return false;
-  }
-
-  TNode cur_node = tree->root, prev_node = tree->root;
-
+  TNode cur_node = tree->root;
+  TNode prev_node = tree->root;
   while(cur_node)
   {
     if(target == cur_node->data)
     {
-      if(!(cur_node->rt) && !(cur_node->lt))
-      {
-        free(cur_node);
-        if(target > prev_node->data)
-          prev_node->rt = NULL;
-        else
-          prev_node->lt = NULL;
-      }
-      else if(cur_node->lt && !(cur_node->rt))
-      {
-        if(target > prev_node->data)
-          prev_node->rt = cur_node->lt;
-        else
-          prev_node->lt = cur_node->lt;
-
-        free(cur_node);
-      }
-      else if(cur_node->rt && !(cur_node->lt))
-      {
-        if(target > prev_node->data)
-          prev_node->rt = cur_node->rt;
-        else
-          prev_node->lt = cur_node->rt;
-
-        free(cur_node);
-      }
-      else
+      if(cur_node->rt && cur_node->lt)
       {
         int min = bst_remove_min_node(cur_node->rt, err);
         if(*err == 0)
-          prev_node->data =min;
+          prev_node->data = min;
+      }
+      else
+      {
+        TNode valid_node = (cur_node->lt ? cur_node->lt : cur_node->rt);
+
+        if(target > prev_node->data)
+          prev_node->rt = valid_node;
+        else
+          prev_node->lt = valid_node;
+
+        free(cur_node);
       }
       tree->size--;
+
+      if(tree->size == 0) // if root was removed
+        tree->root = NULL;
+
       return true;
     }
-
     prev_node = cur_node;
-
-    if(target < cur_node->data)
-      cur_node = cur_node->lt;
-
-    if(target > cur_node->data)
-      cur_node = cur_node->rt;
+    cur_node = (target < cur_node->data ? cur_node->lt : cur_node->rt);
   }
-
   return false;
-}
-
-int
-bst_get_min(const TNode node, int *err)
-{
-  if(!bst_is_valid_node(node))
-  {
-    if(err) *err = BST_NODE_NULL;
-    return 0;
-  }
-  
-  TNode parent = node;
-  TNode min = parent;
-
-  if(parent->lt)
-    min = parent->lt;
-  else if(parent->rt)
-    min = parent->rt;
-
-  while(true)
-  {
-    if(!(min->lt) && !(min->rt))
-      return min->data;
-
-    parent = min;
-    
-    if(min->lt)
-      min = min->lt;
-    else if(min->rt)
-      min = min->rt;
-  }
 }
 
 int
@@ -356,14 +275,8 @@ bst_remove_min_node(TNode node, int *err)
     if(err) *err = BST_NODE_NULL;
     return 0;
   }
-  
   TNode parent = node;
-  TNode min = parent;
-
-  if(parent->lt)
-    min = parent->lt;
-  else if(parent->rt)
-    min = parent->rt;
+  TNode min = (parent->lt ? parent->lt : parent->rt);
 
   while(true)
   {
@@ -379,12 +292,7 @@ bst_remove_min_node(TNode node, int *err)
       free(min);
       return min->data;
     }
-
     parent = min;
-    
-    if(min->lt)
-      min = min->lt;
-    else if(min->rt)
-      min = min->rt;
+    min = (min->lt ? min->lt : min->rt);
   }
 }

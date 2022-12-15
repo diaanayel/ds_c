@@ -238,8 +238,6 @@ t_remove_node_with_two_children()
   TEST_ASSERT_EQUAL(0, err);
 }
 
-
-/*
 void
 t_clear()
 {
@@ -250,7 +248,27 @@ t_clear()
   bst_clear(tree, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, tree->size);
+  TEST_ASSERT_EQUAL(0, bst_size(tree));
+}
+
+void
+t_insert_after_clear()
+{
+  bst_insert(tree, 10, &err);
+  bst_insert(tree, 20, &err);
+  bst_insert(tree, 30, &err);
+
+  bst_clear(tree, &err);
+
+  TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(0, bst_size(tree));
+
+  bst_insert(tree, 10, &err);
+  bst_insert(tree, 8, &err);
+  bst_insert(tree, 7, &err);
+
+  TEST_ASSERT_EQUAL(0, err);
+  TEST_ASSERT_EQUAL(3, bst_size(tree));
 }
 
 void
@@ -259,8 +277,8 @@ t_passing_err_handler_as_null()
   int x;
   bst_insert(tree, 10, NULL);
   bst_clear(tree, NULL);
-  bst_remove(tree, &x, NULL);
-  bst_search(tree, &x, NULL);
+  bst_remove(tree, 10, NULL);
+  bst_search(tree, 10, NULL);
 }
 
 void
@@ -268,8 +286,8 @@ t_passing_outputVar_as_null()
 {
   bst_insert(tree, 10, NULL);
   bst_clear(tree, NULL);
-  bst_remove(tree, NULL, NULL);
-  bst_search(tree, NULL, NULL);
+  bst_remove(tree, 0, NULL);
+  bst_search(tree, 0, NULL);
 }
 
 void
@@ -277,10 +295,9 @@ t_passing_bst_as_null()
 {
   bst_insert(NULL, 10, NULL);
   bst_clear(NULL, NULL);
-  bst_remove(NULL, NULL, NULL);
-  bst_search(NULL, NULL, NULL);
+  bst_remove(NULL, 0, NULL);
+  bst_search(NULL, 0, NULL);
 }
-*/
 
 int main(void){
   UNITY_BEGIN();
@@ -303,11 +320,11 @@ int main(void){
   RUN_TEST(t_remove_leaf_node);
   RUN_TEST(t_remove_node_with_one_child);
   RUN_TEST(t_remove_node_with_two_children);
-  // RUN_TEST(t_remove_two_node_tree);
-  // RUN_TEST(t_clear);
-  // RUN_TEST(t_passing_err_handler_as_null);
-  // RUN_TEST(t_passing_outputVar_as_null);
-  // RUN_TEST(t_passing_bst_as_null);
+  RUN_TEST(t_clear);
+  RUN_TEST(t_insert_after_clear);
+  RUN_TEST(t_passing_err_handler_as_null);
+  RUN_TEST(t_passing_outputVar_as_null);
+  RUN_TEST(t_passing_bst_as_null);
 
   return UNITY_END();
 }
