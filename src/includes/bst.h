@@ -33,5 +33,6 @@ void bst_insert_node(TNode, int, int *);
 bool bst_is_valid(const Bst);
 bool bst_is_valid_tnode(const TNode);
 bool bst_is_empty(const Bst, int*);
+bool bst_is_valid_not_empty(const Bst, int*);
 
 #endif

@@ -1,10 +1,10 @@
 #include <bst.h>
+#include <stdbool.h>
 
 struct tnode
 {
   int data;
-  struct tnode *rt;
-  struct tnode *lt;
+  struct tnode *rt, *lt;
 };
 
 struct bst
@@ -17,7 +17,7 @@ struct bst
 Bst
 bst_init()
 {
-  Bst tree = malloc(sizeof(Bst));
+  Bst tree = (Bst) malloc(sizeof(struct bst));
   if(!bst_is_valid(tree)) return NULL;
 
   tree->size = 0;
@@ -32,6 +32,7 @@ bst_free(Bst tree, int *err)
 
   bst_free_node(tree->root);
   free(tree);
+  tree = NULL;
 }
 
 void
@@ -68,20 +69,28 @@ bst_is_empty(const Bst tree, int *err)
   return (tree->size == 0);
 }
 
-void
-bst_visualize(const Bst tree, int *err)
+bool
+bst_is_valid_not_empty(const Bst tree, int *err)
 {
   if(!bst_is_valid(tree))
   {
     if(err) *err = BST_NULL;
-    return;
+    return false;
   }
 
   if(bst_is_empty(tree, err))
   {
     if(err) *err = BST_EMPTY;
-    return;
+    return false;
   }
+
+  return true;
+}
+
+void
+bst_visualize(const Bst tree, int *err)
+{
+  if(!bst_is_valid_not_empty(tree, err)) return;
 
   bst_visualize_node(tree->root);
 }
@@ -91,18 +100,21 @@ bst_visualize_node(const TNode node)
 {
   if(node)
   {
-    printf(" %d -> ( ", node->data);
+    if(node->lt || node->rt)
+    {
+      printf(" %d -> ( ", node->data);
 
-    if(node->rt)
-      printf(" rt: %d ", node->rt->data);
+      if(node->rt)
+        printf(" rt: %d ", node->rt->data);
 
-    if(node->lt)
-      printf(" lt: %d ", node->lt->data);
+      if(node->lt)
+        printf(" lt: %d ", node->lt->data);
 
-    printf(" )\n");
+      printf(" )\n");
 
-    bst_visualize_node(node->lt);
-    bst_visualize_node(node->rt);
+      bst_visualize_node(node->lt);
+      bst_visualize_node(node->rt);
+    }
   }
 }
 
@@ -115,7 +127,7 @@ bst_insert(Bst tree, int data, int *err)
     return;
   }
 
-  TNode node = malloc(sizeof(TNode));
+  TNode node = (TNode) malloc(sizeof(struct tnode));
   if(!bst_is_valid_node(node))
   {
     if(err) *err = BST_NODE_NULL;
@@ -141,8 +153,7 @@ bst_insert(Bst tree, int data, int *err)
       if(!(cur_node->lt))
       {
         cur_node->lt = node;
-        tree->size++;
-        return;
+        break;
       }
       cur_node = cur_node->lt;
     }
@@ -152,100 +163,73 @@ bst_insert(Bst tree, int data, int *err)
       if(!(cur_node->rt))
       {
         cur_node->rt = node;
-        tree->size++;
-        return;
+        break;
       }
       cur_node = cur_node->rt;
     }
   }
-
+  tree->size++;
 }
 
 bool
 bst_search(const Bst tree, int target, int *err)
 {
-  if(!bst_is_valid(tree))
-  {
-    if(err != NULL) *err = BST_NULL;
-    return false;
-  }
-
-  if(bst_is_empty(tree, err))
-  {
-    if(err != NULL) *err = BST_EMPTY;
-    return false;
-  }
+  if(!bst_is_valid_not_empty(tree, err)) return false;
 
   TNode cur_node = tree->root;
   while(cur_node)
   {
-    int data = cur_node->data;
-
-    printf(">>> %d, %d, %d\n", data, 
-        cur_node->lt->data, cur_node->rt->data);
-
-    if(target == data)
+    if(target == cur_node->data)
       return true;
 
-    if(target < data)
-    {
-      printf("moving lt\n");
+    if(target < cur_node->data)
       cur_node = cur_node->lt;
-    }
-
-    if(target > data)
-    {
-      printf("moving rt\n");
+    else
       cur_node = cur_node->rt;
-    }
   }
-
   return false;
 }
 
 bool
 bst_remove(Bst tree, int target, int *err)
 {
-  if(!bst_is_valid(tree)) return false;
+  if(!bst_is_valid_not_empty(tree, err)) return false;
 
-  if(bst_is_empty(tree, err))
+  if(tree->size == 1)
   {
-    if(err != NULL)
-      *err = BST_EMPTY;
+    if(target == tree->root->data)
+    {
+      free(tree->root);
+      tree->root = NULL;
+      tree->size--;
+      return true;
+    }
     return false;
   }
 
-  if(tree->size == 1 && target == tree->root->data)
-  {
-    free(tree->root);
-    tree->root = NULL;
-    tree->size--;
-    return true;
-  }
-
-  TNode cur_node = tree->root;
-  TNode prev_node;
+  TNode cur_node = tree->root, prev_node = tree->root;
 
   while(cur_node)
   {
+    printf("cur: %d, prev: %d\n", cur_node->data, prev_node->data);
     if(target == cur_node->data)
     {
+      printf("found %d at ", cur_node->data);
       if(!(cur_node->rt) && !(cur_node->lt))
       {
         free(cur_node);
-
         if(target > prev_node->data)
         {
-          printf(">>> rt ");
+          printf("rt ");
           prev_node->rt = NULL;
         }
         else
         {
-          printf(">>> lt ");
+          printf("lt ");
           prev_node->lt = NULL;
         }
       }
-
+      printf("of %d\n", prev_node->data);
       tree->size--;
       return true;
     }
@@ -258,7 +242,6 @@ bst_remove(Bst tree, int target, int *err)
     if(target > cur_node->data)
       cur_node = cur_node->rt;
   }
-
   return false;
 }
 
