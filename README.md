@@ -3,6 +3,10 @@
 ### i'll upload some datastructure writen in c to this repo
 * [x] singly linked list
 * [x] stack (using linked list)
+* [x] queue (using linked list)
+* [x] queue using stacks
+* [x] queue with amortized pop, push, getmin
+* [x] tree (BST)
 
 ### test framework used is [Unity framework](https://github.com/ThrowTheSwitch/Unity "Unity Test framework")
 
