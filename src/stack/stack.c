@@ -1,10 +1,23 @@
 #include <stack.h>
+#include <stdbool.h>
 
-Stack*
+struct snode
+{
+  int data;
+  struct snode *next;
+};
+
+struct stack
+{
+  int size;
+  SNode top;
+};
+
+Stack
 stack_init()
 {
-  Stack *stack = malloc(sizeof(Stack));
-  if(!is_valid_stack(stack)) return NULL;
+  Stack stack = malloc(sizeof(struct stack));
+  if(!stack_is_valid(stack)) return NULL;
 
   stack->size = 0;
   stack->top = NULL;
@@ -13,16 +26,16 @@ stack_init()
 }
 
 void
-stack_free(Stack *stack, int *err)
+stack_free(Stack stack, int *err)
 {
-  if(!is_valid_stack(stack))
+  if(!stack_is_valid(stack))
   {
     if(err != NULL)
       *err = STACK_NULL;
     return;
   }
 
-  Node *holder;
+  SNode holder;
   
   while(stack->top != NULL)
   {
@@ -30,44 +43,62 @@ stack_free(Stack *stack, int *err)
     stack->top = stack->top->next;
 
     free(holder);
-    holder = NULL;
   }
   free(stack);
   stack = NULL;
 }
 
 bool
-is_valid_stack_node(const Node * const node)
+stack_is_valid_node(const SNode node)
 {
-  return node != NULL;
+  return (node != NULL);
 }
 
 bool
-is_valid_stack(const Stack * const stack)
+stack_is_valid(const Stack stack)
 {
-  return stack != NULL;
+  return (stack != NULL);
 }
 
 bool
-is_empty_stack(const Stack * const stack)
+stack_is_empty(const Stack stack)
 {
-  if(!is_valid_stack(stack)) return STACK_NULL;
+  if(!stack_is_valid(stack)) return STACK_NULL;
 
-  return (stack->size == 0) ;
+  return (stack->size == 0);
+}
+
+bool
+stack_is_valid_not_empty(const Stack stack, int *err)
+{
+  if(!stack_is_valid(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return false;
+  }
+
+  if(stack_is_empty(stack))
+  {
+    if(err != NULL)
+      *err = STACK_EMPTY;
+    return false;
+  }
+  return true;
 }
 
 void
-stack_push(Stack * const stack, int data, int *err)
+stack_push(Stack stack, int data, int *err)
 {
-  if(!is_valid_stack(stack))
+  if(!stack_is_valid(stack))
   {
     if(err != NULL)
       *err = STACK_NULL;
     return;
   }
 
-  Node *new_top = malloc(sizeof(Node));
-  if(!is_valid_stack_node(new_top))
+  SNode new_top = malloc(sizeof(struct snode));
+  if(!stack_is_valid_node(new_top))
   {
     if(err != NULL)
       *err = STACK_NODE_NULL;
@@ -81,73 +112,46 @@ stack_push(Stack * const stack, int data, int *err)
 }
 
 void
-stack_peek(const Stack * const stack, int *output,int *err)
+stack_peek(const Stack stack, int *output,int *err)
 {
-  if(!is_valid_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_NULL;
-    return;
-  }
-
-  if(is_empty_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_EMPTY;
-    return;
-  }
+  if(!stack_is_valid_not_empty(stack, err)) return;
 
   if(output != NULL)
     *output = stack->top->data;
 }
 
 void
-stack_pop(Stack * const stack, int *output,int *err)
+stack_pop(Stack stack, int *output,int *err)
 {
-  if(!is_valid_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_NULL;
-    return;
-  }
+  if(!stack_is_valid_not_empty(stack, err)) return;
 
-  if(is_empty_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_EMPTY;
-    return;
-  }
+  SNode top = stack->top;
 
   if(output != NULL)
-    *output = stack->top->data;
-
-  Node *node_to_remove = stack->top;
+    *output = top->data;
 
   stack->top = stack->top->next;
-
-  free(node_to_remove);
-
+  free(top);
   stack->size--;
 }
 
 void
-stack_clear(Stack *stack, int *err)
+stack_clear(Stack stack, int *err)
 {
-  if(!is_valid_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_NULL;
-    return;
-  }
-
-  if(is_empty_stack(stack))
-  {
-    if(err != NULL)
-      *err = STACK_EMPTY;
-    return;
-  }
+  if(!stack_is_valid_not_empty(stack, err)) return;
 
   while(stack->size != 0)
     stack_pop(stack, NULL, err);
 }
 
+int
+stack_get_size(const Stack stack, int *err)
+{
+  if(!stack_is_valid(stack))
+  {
+    if(err != NULL)
+      *err = STACK_NULL;
+    return -1;
+  }
+  return (stack->size);
+}
