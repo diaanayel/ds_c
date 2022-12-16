@@ -38,12 +38,12 @@ bst_free(Bst tree, int *err)
 void
 bst_free_node(TNode node)
 {
-  if(node)
-  {
-    bst_free_node(node->rt);
-    bst_free_node(node->lt);
-    free(node);
-  }
+  if(!node)
+    return;
+
+  bst_free_node(node->rt);
+  bst_free_node(node->lt);
+  free(node);
 }
 
 bool
@@ -83,7 +83,6 @@ bst_is_valid_not_empty(const Bst tree, int *err)
     if(err) *err = BST_EMPTY;
     return false;
   }
-
   return true;
 }
 
@@ -120,7 +119,6 @@ bst_get_node_data(TNode node, int *output, int *err)
     if(err) *err = BST_NODE_NULL;
     return;
   }
-
   if(output)
     *output = node->data;
 }
@@ -154,6 +152,27 @@ bst_visualize_node(const TNode node)
       bst_visualize_node(node->rt);
     }
   }
+}
+
+void
+bst_inorder(const Bst tree, int *err)
+{
+  if(!bst_is_valid_not_empty(tree, err)) return;
+
+  bst_inorder_node(tree->root);
+  printf("\n");
+}
+
+void
+bst_inorder_node(const TNode node)
+{
+  if(!node)
+    return;
+
+  bst_inorder_node(node->lt);
+  printf("%d ", node->data);
+  bst_inorder_node(node->rt);
+
 }
 
 TNode
