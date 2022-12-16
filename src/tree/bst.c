@@ -247,7 +247,7 @@ bst_search(const Bst tree, int target, int *err)
 
 bool
 bst_remove(Bst tree, int target, int *err)
-{
+{ // needs refactoeing !
   if(!bst_is_valid_not_empty(tree, err)) return false;
 
   TNode cur_node = tree->root;
