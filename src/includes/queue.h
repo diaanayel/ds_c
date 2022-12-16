@@ -11,31 +11,22 @@
 #define QUEUE_NODE_NULL -4
 #define QUEUE_OUT_OF_BOUNDS -4
 
-typedef struct node
-{
-  int data;
-  struct node *next;
-} Node;
+typedef struct node *QNode;
 
-typedef struct
-{
-  int size;
-  Node *head;
-  Node *tail;
-} Queue;
+typedef struct queue *Queue;
 
-Queue* queue_init();
-void queue_free(Queue*, int*);
-void queue_clear(Queue*, int*);
+Queue queue_init();
+void queue_free(Queue, int*);
+void queue_clear(Queue, int*);
 
-void queue_push(Queue*, int, int*);
-void queue_peek(const Queue * const, int*, int*);
-void queue_pop(Queue * const, int*, int*);
+void queue_push(Queue, int, int*);
+void queue_peek(const Queue, int*, int*);
+void queue_pop(Queue, int*, int*);
 
-void queue_push_to_empty(Queue * const, int, int*);
-
-bool is_valid_queue_node(const Node * const);
-bool is_valid_queue(const Queue * const);
-bool is_empty_queue(const Queue * const, int*);
+bool queue_is_valid_node(const QNode);
+bool queue_is_valid(const Queue);
+bool queue_is_empty(const Queue, int*);
+bool queue_is_valid_not_empty(const Queue, int*);
+int queue_get_size(const Queue, int*);
 
 #endif

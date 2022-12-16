@@ -1,4 +1,3 @@
-#include "unity_internals.h"
 #include <unity.h>
 #include <queue.h>
 
@@ -7,7 +6,7 @@
 
 
 int err;
-Queue *queue;
+Queue queue;
 
 void setUp (void) {
   err = 0;
@@ -25,30 +24,26 @@ t_test_environment()
 }
 
 void
-t_push_to_empty_queue()
+t_push_to_empty()
 {
   queue_push(queue, 10, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(1, queue->size);
-  TEST_ASSERT_EQUAL(10, queue->head->data);
-  TEST_ASSERT_EQUAL(10, queue->tail->data);
+  TEST_ASSERT_EQUAL(1, queue_get_size(queue, &err));
 }
 
 void
-t_push_one_item_to_non_empty_queue()
+t_push_one_item_to_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 20, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(2, queue->size);
-  TEST_ASSERT_EQUAL(20, queue->tail->data);
-  TEST_ASSERT_EQUAL(10, queue->head->data);
+  TEST_ASSERT_EQUAL(2, queue_get_size(queue, &err));
 }
 
 void
-t_push_multiple_items_to_non_empty_queue()
+t_push_multiple_items_to_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 20, &err);
@@ -56,16 +51,13 @@ t_push_multiple_items_to_non_empty_queue()
   queue_push(queue, 40, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(4, queue->size);
-  TEST_ASSERT_EQUAL(40, queue->tail->data);
-  TEST_ASSERT_EQUAL(10, queue->head->data);
+  TEST_ASSERT_EQUAL(4, queue_get_size(queue, &err));
 }
 
 void
-t_peek_empty_queue()
+t_peek_empty()
 {
   int x = 0;
-
   queue_peek(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(QUEUE_EMPTY, err);
@@ -73,7 +65,7 @@ t_peek_empty_queue()
 }
 
 void
-t_peek_non_empty_queue()
+t_peek_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 20, &err);
@@ -81,18 +73,17 @@ t_peek_non_empty_queue()
   queue_push(queue, 40, &err);
 
   int x = 0;
-
   queue_peek(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
   TEST_ASSERT_EQUAL(10, x);
+  TEST_ASSERT_EQUAL(4, queue_get_size(queue, &err));
 }
 
 void
-t_pop_empty_queue()
+t_pop_empty()
 {
   int x = 0;
-
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(QUEUE_EMPTY, err);
@@ -100,22 +91,20 @@ t_pop_empty_queue()
 }
 
 void
-t_pop_one_element_queue()
+t_pop_one_element()
 {
   queue_push(queue, 10, &err);
 
   int x = 0;
-
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, queue->size);
+  TEST_ASSERT_EQUAL(0, queue_get_size(queue, &err));
   TEST_ASSERT_EQUAL(10, x);
-  TEST_ASSERT_EQUAL(NULL, queue->head);
 }
 
 void
-t_pop_one_element_from_non_empty_queue()
+t_pop_one_element_from_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 20, &err);
@@ -127,15 +116,13 @@ t_pop_one_element_from_non_empty_queue()
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(3, queue->size);
   TEST_ASSERT_EQUAL(10, x);
-  TEST_ASSERT_EQUAL(40, queue->tail->data);
-  TEST_ASSERT_EQUAL(20, queue->head->data);
+  TEST_ASSERT_EQUAL(3, queue_get_size(queue, &err));
 }
 
 
 void
-t_pop_multiple_elements_from_non_empty_queue()
+t_pop_multiple_elements_from_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 20, &err);
@@ -143,25 +130,18 @@ t_pop_multiple_elements_from_non_empty_queue()
   queue_push(queue, 40, &err);
 
   int x = 0;
-
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(3, queue->size);
   TEST_ASSERT_EQUAL(10, x);
-  TEST_ASSERT_EQUAL(40, queue->tail->data);
-  TEST_ASSERT_EQUAL(20, queue->head->data);
-
+  TEST_ASSERT_EQUAL(3, queue_get_size(queue, &err));
 
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(2, queue->size);
   TEST_ASSERT_EQUAL(20, x);
-  TEST_ASSERT_EQUAL(40, queue->tail->data);
-  TEST_ASSERT_EQUAL(30, queue->head->data);
+  TEST_ASSERT_EQUAL(2, queue_get_size(queue, &err));
 }
-
 
 void
 t_push_after_pop_all_elememts()
@@ -171,28 +151,27 @@ t_push_after_pop_all_elememts()
   queue_push(queue, 30, &err);
 
   int x = 0;
-
   queue_pop(queue, &x, &err);
   queue_pop(queue, &x, &err);
   queue_pop(queue, &x, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, queue->size);
+  TEST_ASSERT_EQUAL(0, queue_get_size(queue, &err));
   TEST_ASSERT_EQUAL(30, x);
-  TEST_ASSERT_EQUAL(NULL, queue->head);
 
   queue_push(queue, 40, &err);
   queue_push(queue, 50, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(2, queue->size);
+  TEST_ASSERT_EQUAL(2, queue_get_size(queue, &err));
 
   queue_peek(queue, &x, &err);
   TEST_ASSERT_EQUAL(40, x);
+  TEST_ASSERT_EQUAL(0, err);
 }
 
 void
-t_clear_empty_queue()
+t_clear_empty()
 {
   queue_clear(queue, &err);
 
@@ -200,18 +179,18 @@ t_clear_empty_queue()
 }
 
 void
-t_clear_one_element_queue()
+t_clear_one_element()
 {
   queue_push(queue, 10, &err);
 
   queue_clear(queue, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, queue->size);
+  TEST_ASSERT_EQUAL(0, queue_get_size(queue, &err));
 }
 
 void
-t_clear_non_empty_queue()
+t_clear_non_empty()
 {
   queue_push(queue, 10, &err);
   queue_push(queue, 10, &err);
@@ -221,7 +200,7 @@ t_clear_non_empty_queue()
   queue_clear(queue, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(0, queue->size);
+  TEST_ASSERT_EQUAL(0, queue_get_size(queue, &err));
 }
 
 void
@@ -238,10 +217,7 @@ t_push_after_clearing()
   queue_push(queue, 60, &err);
 
   TEST_ASSERT_EQUAL(0, err);
-  TEST_ASSERT_EQUAL(2, queue->size);
-
-  TEST_ASSERT_EQUAL(50, queue->head->data);
-  TEST_ASSERT_EQUAL(60, queue->tail->data);
+  TEST_ASSERT_EQUAL(2, queue_get_size(queue, &err));
 }
 
 void
@@ -264,7 +240,7 @@ t_passing_outputVar_as_null()
 }
 
 void
-t_passing_queue_as_null()
+t_passing_as_null()
 {
   queue_push(NULL, 10, NULL);
   queue_clear(NULL, NULL);
@@ -276,25 +252,25 @@ int main(void){
   UNITY_BEGIN();
 
   RUN_TEST(t_test_environment);
-//   RUN_TEST(t_queue_init);
-//   RUN_TEST(t_queue_free);
-  RUN_TEST(t_push_to_empty_queue);
-  RUN_TEST(t_push_one_item_to_non_empty_queue);
-  RUN_TEST(t_push_multiple_items_to_non_empty_queue);
-  RUN_TEST(t_peek_empty_queue);
-  RUN_TEST(t_peek_non_empty_queue);
-  RUN_TEST(t_pop_empty_queue);
-  RUN_TEST(t_pop_one_element_queue);
-  RUN_TEST(t_pop_one_element_from_non_empty_queue);
-  RUN_TEST(t_pop_multiple_elements_from_non_empty_queue);
+//   RUN_TEST(t_init);
+//   RUN_TEST(t_free);
+  RUN_TEST(t_push_to_empty);
+  RUN_TEST(t_push_one_item_to_non_empty);
+  RUN_TEST(t_push_multiple_items_to_non_empty);
+  RUN_TEST(t_peek_empty);
+  RUN_TEST(t_peek_non_empty);
+  RUN_TEST(t_pop_empty);
+  RUN_TEST(t_pop_one_element);
+  RUN_TEST(t_pop_one_element_from_non_empty);
+  RUN_TEST(t_pop_multiple_elements_from_non_empty);
   RUN_TEST(t_push_after_pop_all_elememts);
-  RUN_TEST(t_clear_empty_queue);
-  RUN_TEST(t_clear_one_element_queue);
-  RUN_TEST(t_clear_non_empty_queue);
+  RUN_TEST(t_clear_empty);
+  RUN_TEST(t_clear_one_element);
+  RUN_TEST(t_clear_non_empty);
   RUN_TEST(t_push_after_clearing);
   RUN_TEST(t_passing_err_handler_as_null);
   RUN_TEST(t_passing_outputVar_as_null);
-  RUN_TEST(t_passing_queue_as_null);
+  RUN_TEST(t_passing_as_null);
 
   return UNITY_END();
 }
