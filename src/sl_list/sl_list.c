@@ -1,64 +1,98 @@
 #include <sl_list.h>
+#include <stdbool.h>
 
-SL_List*
-sll_init(int *err)
+struct slnode
 {
-  SL_List *list = malloc(sizeof(SL_List));
+  int data;
+  struct slnode *next;
+};
 
-  if(list == NULL) { *err = SLL_NULL; return NULL; }
+struct sl_list
+{
+  int size;
+  SLNode head, tail;
+};
+
+SL_List
+sll_init()
+{
+  SL_List list = malloc(sizeof(struct sl_list));
+
+  if(list == NULL)
+    return NULL;
 
   list->size = 0;
-  list->head = NULL;
-  list->tail = NULL;
+  list->head = list->tail = NULL;
 
   return list;
 }
 
 bool
-sll_is_valid_node(const Node * const node, int *err)
+sll_is_valid_node(const SLNode node)
 {
-  if(node == NULL) { *err = SLL_NODE_NULL; return false; }
-
-  return true;
+  return (node != NULL);
 }
 
 bool
-sll_is_valid_list(const SL_List * const list, int *err)
+sll_is_valid_list(const SL_List list)
 {
-  if(list == NULL) { *err = SLL_NULL; return false; }
-
-  return true;
+  return (list != NULL);
 }
 
 bool
-sll_is_empty(const SL_List * const list, int *err)
+sll_is_empty(const SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return SLL_NULL;
-
-  return (list->size == 0 && list->head == NULL && list->tail == NULL) ;
-}
-
-bool
-sll_is_valid_index(const SL_List * const list, int index, int *err)
-{
-  if(!sll_is_valid_list(list, err)) return SLL_NULL;
-
-  if(index >= 0 && index <= list->size)
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
     return true;
-
-  *err = SLL_OUT_OF_BOUNDS;
-  return false;
+  }
+  return (list->size == 0);
 }
 
-Node*
-sll_get_node_at(const SL_List* const list, int index, int *err)
+bool
+sll_is_valid_not_empty(const SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return NULL;
-  
-  if(sll_is_empty(list, err)) return NULL;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return false;
+  }
+  if(sll_is_empty(list, err))
+  {
+    if(err)
+      *err = SLL_EMPTY;
+    return false;
+  }
+  return true;
+}
 
-  Node *holder = list->head;
-  if(!sll_is_valid_node(holder, err)) return NULL;
+bool
+sll_is_valid_index(const SL_List list, int index, int *err)
+{
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return SLL_NULL;
+  }
+  return (index >= 0 && index <= list->size);
+}
+
+SLNode
+sll_get_node_at(const SL_List list, int index, int *err)
+{
+  if(!sll_is_valid_not_empty(list, err)) return NULL;
+
+  SLNode holder = list->head;
+  if(!sll_is_valid_node(holder))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+    return NULL;
+  }
 
   int cur_index = 0;
 
@@ -71,12 +105,17 @@ sll_get_node_at(const SL_List* const list, int index, int *err)
 }
 
 void
-sll_print(const SL_List * const list, int *err)
+sll_print(const SL_List list, int *err)
 { // make it prettier !
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_not_empty(list, err)) return;
 
-  Node *holder = list->head;
-  if(!sll_is_valid_node(holder, err)) return;
+  SLNode holder = list->head;
+  if(!sll_is_valid_node(holder))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+    return;
+  }
 
   while(holder != NULL)
   {
@@ -87,14 +126,24 @@ sll_print(const SL_List * const list, int *err)
 }
 
 void
-sll_free(SL_List *list, int *err)
+sll_free(SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return;
+  }
 
   while(list->head != NULL)
   {
-    Node *holder = list->head;
-    if(!sll_is_valid_node(holder, err)) return;
+    SLNode holder = list->head;
+    if(!sll_is_valid_node(holder))
+    {
+      if(err)
+        *err = SLL_NODE_NULL;
+     return;
+    }
 
     list->head = list->head->next;
 
@@ -106,22 +155,34 @@ sll_free(SL_List *list, int *err)
 }
 
 int
-sll_size(const SL_List * const list, int *err)
+sll_size(const SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return SLL_NULL;
-  return list->size;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return -1;
+  }
+  return (list->size);
 }
 
-
 void
-sll_push_to_empty(SL_List *list, int data, int *err)
+sll_push_to_empty(SL_List list, int data, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return;
+  }
 
-  if(!sll_is_empty(list, err)) return;
-
-  Node *node = malloc(sizeof(Node));
-  if(!sll_is_valid_node(node, err)) return;
+  SLNode node = malloc(sizeof(struct slnode));
+  if(!sll_is_valid_node(node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   node->data = data;
 
@@ -133,9 +194,14 @@ sll_push_to_empty(SL_List *list, int data, int *err)
 
 
 void
-sll_push_head(SL_List *list, int data, int *err)
+sll_push_head(SL_List list, int data, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return;
+  }
 
   if(sll_is_empty(list, err))
   {
@@ -143,8 +209,13 @@ sll_push_head(SL_List *list, int data, int *err)
     return;
   }
   
-  Node *node = malloc(sizeof(Node));
-  if(!sll_is_valid_node(node, err)) return;
+  SLNode node = malloc(sizeof(struct slnode));
+  if(!sll_is_valid_node(node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   node->data = data;
 
@@ -154,9 +225,14 @@ sll_push_head(SL_List *list, int data, int *err)
 }
 
 void
-sll_push_tail(SL_List *list, int data, int *err)
+sll_push_tail(SL_List list, int data, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return;
+  }
 
   if(sll_is_empty(list, err))
   {
@@ -164,8 +240,13 @@ sll_push_tail(SL_List *list, int data, int *err)
     return;
   }
  
-  Node *node = malloc(sizeof(Node));
-  if(!sll_is_valid_node(node, err)) return;
+  SLNode node = malloc(sizeof(struct slnode));
+  if(!sll_is_valid_node(node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   node->data = data;
 
@@ -176,14 +257,29 @@ sll_push_tail(SL_List *list, int data, int *err)
 }
 
 void
-sll_push_at(SL_List *list, int index, int data, int *err)
+sll_push_at(SL_List list, int index, int data, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_list(list))
+  {
+    if(err)
+      *err = SLL_NULL;
+    return;
+  }
 
-  if(!sll_is_valid_index(list, index, err)) return;
+  if(!sll_is_valid_index(list, index, err))
+  {
+    if(err)
+      *err = SLL_OUT_OF_BOUNDS;
+    return;
+  }
 
-  Node *node = malloc(sizeof(Node));
-  if(!sll_is_valid_node(node, err)) return;
+  SLNode node = malloc(sizeof(struct slnode));
+  if(!sll_is_valid_node(node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   node->data = data;
 
@@ -193,40 +289,42 @@ sll_push_at(SL_List *list, int index, int data, int *err)
     return;
   }
 
-  Node *prev_node = sll_get_node_at(list, index-1, err);
-  if(!sll_is_valid_node(prev_node, err)) return;
+  SLNode prev_node = sll_get_node_at(list, index-1, err);
+  if(!sll_is_valid_node(prev_node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   node->next = prev_node->next;
   prev_node->next = node;
   list->size++;
 }
 
-int
-sll_peek(const SL_List* const list, int index, int *err)
+void
+sll_peek(const SL_List list, int index, int *output, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return SLL_NULL;
-  
-  if(sll_is_empty(list, err)) return SLL_EMPTY;
+  if(!sll_is_valid_not_empty(list, err)) return;
 
-  Node *holder = sll_get_node_at(list, index, err);
-  if(!sll_is_valid_node(holder, err)) return SLL_NODE_NULL;
-  
-  return holder->data;
+  SLNode holder = sll_get_node_at(list, index, err);
+
+  if(output)
+    *output = holder->data;
 }
 
 void
-sll_remove_head(SL_List *list, int *err)
+sll_remove_head(SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
-  
-  if(sll_is_empty(list, err))
-  {
-    *err = SLL_EMPTY;
-    return;
-  }
+  if(!sll_is_valid_not_empty(list, err)) return;
 
-  Node *node = list->head;
-  if(!sll_is_valid_node(node, err)) return;
+  SLNode node = list->head;
+  if(!sll_is_valid_node(node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
   list->head = list->head->next;
   free(node);
@@ -235,18 +333,17 @@ sll_remove_head(SL_List *list, int *err)
 
 
 void
-sll_remove_tail(SL_List *list, int *err)
+sll_remove_tail(SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_not_empty(list, err)) return;
   
-  if(sll_is_empty(list, err))
+  SLNode pre_tail = sll_get_node_at(list, list->size - 2, err);
+  if(!sll_is_valid_node(pre_tail))
   {
-    *err = SLL_EMPTY;
-    return;
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
   }
-  
-  Node *pre_tail = sll_get_node_at(list, list->size - 2, err);
-  if(!sll_is_valid_node(pre_tail, err)) return;
 
   free(pre_tail->next);
   pre_tail->next = NULL;
@@ -256,17 +353,16 @@ sll_remove_tail(SL_List *list, int *err)
 
 
 void
-sll_remove_at(SL_List* const list, int index, int *err)
+sll_remove_at(SL_List list, int index, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_not_empty(list, err)) return;
 
-  if(sll_is_empty(list, err))
+  if(!sll_is_valid_index(list, index, err))
   {
-    *err = SLL_EMPTY;
+    if(err)
+      *err = SLL_OUT_OF_BOUNDS;
     return;
   }
-
-  if(!sll_is_valid_index(list, index, err)) return;
 
   if(index == 0)
   {
@@ -280,39 +376,42 @@ sll_remove_at(SL_List* const list, int index, int *err)
     return;
   }
 
-  Node *prev_node = sll_get_node_at(list, index-1, err);
-  if(!sll_is_valid_node(prev_node, err)) return;
+  SLNode prev_node = sll_get_node_at(list, index-1, err);
+  if(!sll_is_valid_node(prev_node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
 
-  Node *next_node = prev_node->next->next;
-  if(!sll_is_valid_node(next_node, err)) return;
+  SLNode next_node = prev_node->next->next;
+  if(!sll_is_valid_node(next_node))
+  {
+    if(err)
+      *err = SLL_NODE_NULL;
+   return;
+  }
   
   free(prev_node->next);
   prev_node->next = next_node;
   list->size--;
 }
 
-
 void
-sll_reverse(SL_List *list, int *err)
+sll_reverse(SL_List list, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
-
-  if(sll_is_empty(list, err))
-  {
-    *err = SLL_EMPTY;
-    return;
-  }
+  if(!sll_is_valid_not_empty(list, err)) return;
 
   if(list->size == 1) return;
 
   list->tail = list->head;
 
-  Node *prev = list->head;
-  Node *node = prev->next;
+  SLNode prev = list->head;
+  SLNode node = prev->next;
 
   while(node != NULL)
   {
-    Node *next = node->next;
+    SLNode next = node->next;
     node->next = prev;
     prev = node;
     node = next;
@@ -323,21 +422,19 @@ sll_reverse(SL_List *list, int *err)
 }
 
 void
-sll_convert_to_array(SL_List *list, int *array, int *err)
+sll_convert_to_array(SL_List list, int *array, int *err)
 {
-  if(!sll_is_valid_list(list, err)) return;
+  if(!sll_is_valid_not_empty(list, err)) return;
 
-  if(sll_is_empty(list, err))
+  SLNode holder = list->head;
+  if(!sll_is_valid_node(holder))
   {
-    *err = SLL_EMPTY;
+    if(err)
+      *err = SLL_NODE_NULL;
     return;
   }
 
-  Node *holder = list->head;
-  if(!sll_is_valid_node(holder, err)) return;
-
   int index = 0;
-
   while(holder != NULL)
   {
     array[index++] = holder->data;
