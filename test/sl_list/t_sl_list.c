@@ -349,6 +349,29 @@ t_convert_empty_list_to_array()
   TEST_ASSERT_EQUAL(SLL_EMPTY, err);
 }
 
+void
+t_convert_non_empty_list_to_array()
+{
+  sll_push_head(list, 10, &err);
+  sll_push_head(list, 20, &err);
+  sll_push_head(list, 30, &err);
+  sll_push_head(list, 40, &err);
+  sll_push_head(list, 50, &err);
+
+  int array[sll_size(list, &err)];
+  sll_convert_to_array(list, array, &err);
+
+  int x = 0, y = 0;
+  sll_peek(list, 0, &x, &err);
+  sll_peek(list, 4, &y, &err);
+  TEST_ASSERT_EQUAL(50, x);
+  TEST_ASSERT_EQUAL(10, y);
+  TEST_ASSERT_EQUAL(0, err);
+
+  TEST_ASSERT_EQUAL(x, array[0]);
+  TEST_ASSERT_EQUAL(y, array[4]);
+}
+
 int main(void){
   UNITY_BEGIN();
 
@@ -382,6 +405,7 @@ int main(void){
   RUN_TEST(t_reverse_one_item_list);
   RUN_TEST(t_reverse_non_empty);
   RUN_TEST(t_convert_empty_list_to_array);
+  RUN_TEST(t_convert_non_empty_list_to_array);
 
   return UNITY_END();
 }
